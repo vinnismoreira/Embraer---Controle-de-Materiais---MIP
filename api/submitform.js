@@ -17,7 +17,7 @@ export default async function handler(req, res) {
     await sheets.spreadsheets.values.append({
       auth: client,
       spreadsheetId: process.env.SPREADSHEET_ID,
-      range: "Sheet1!A:C",
+      range: "Sheet1!A:K",
       valueInputOption: "RAW",
       requestBody: {
         values: [[
