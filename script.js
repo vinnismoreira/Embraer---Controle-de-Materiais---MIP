@@ -1,13 +1,10 @@
 // Stock Management System
 class StockManager {
     constructor() {
-        // Carrega do localStorage ou usa lista vazia
         this.stockItems = JSON.parse(localStorage.getItem('stockItems')) || [];
-
         this.currentFilter = 'ALL';
         this.currentSearch = '';
         this.editingItemId = null;
-
         this.init();
     }
 
@@ -15,8 +12,6 @@ class StockManager {
         this.bindEvents();
         this.renderTable();
         this.updateItemsCount();
-
-        // Set today's date as default for verification date
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('verification-date').value = today;
     }
@@ -42,6 +37,12 @@ class StockManager {
 
         document.getElementById('item-modal').addEventListener('click', e => {
             if (e.target.id === 'item-modal') this.closeModal();
+        });
+
+        // Auto-generate material ID
+        document.getElementById('material-name').addEventListener('input', e => {
+            const matId = document.getElementById('material-id');
+            if (!matId.value && e.target.value) matId.value = `MAT-2024-${Date.now().toString().slice(-6)}`;
         });
     }
 
@@ -99,7 +100,7 @@ class StockManager {
         document.getElementById('save-item-btn').disabled = !isValid;
     }
 
-    saveItem() {
+    async saveItem() {
         const formData = {
             name: document.getElementById('material-name').value,
             materialId: document.getElementById('material-id').value,
@@ -136,6 +137,19 @@ class StockManager {
         this.renderTable();
         this.updateItemsCount();
         this.closeModal();
+
+        // Envia para Google Sheets
+        try {
+            const response = await fetch('/api/submitForm', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+            const result = await response.json();
+            if (!result.success) console.error('Erro ao enviar para o Google Sheets:', result.error);
+        } catch (err) {
+            console.error('Erro de conexão com o backend:', err);
+        }
     }
 
     deleteItem(itemId) {
@@ -164,7 +178,6 @@ class StockManager {
         if (!filtered.length) {
             tbody.innerHTML = '';
             noItemsMsg.style.display = 'block';
-            // atualiza contagem quando vazio
             document.getElementById('items-count').textContent = `Exibindo 0 de ${this.stockItems.length} itens`;
             return;
         }
@@ -173,8 +186,6 @@ class StockManager {
     
         filtered.forEach(item => {
             const row = document.createElement('tr');
-    
-            // NOTE: a ordem das <td> deve corresponder exatamente à ordem dos <th> no HTML
             row.innerHTML = `
                 <td>${item.name || '-'}</td>
                 <td>${item.materialId || '-'}</td>
@@ -185,7 +196,7 @@ class StockManager {
                         ${item.status || '-'}
                     </span>
                 </td>
-                <td>${item.discardReason || '-'}</td> <!-- Motivo de Descarte -->
+                <td>${item.discardReason || '-'}</td>
                 <td>
                     <a href="#" class="action-link action-edit" data-id="${item.id}">Editar</a>
                     <a href="#" class="action-link action-delete" data-id="${item.id}">Excluir</a>
@@ -194,7 +205,6 @@ class StockManager {
             tbody.appendChild(row);
         });
     
-        // usa e.currentTarget para pegar corretamente o data-id mesmo se clicar no <i> interno
         tbody.querySelectorAll('.action-edit').forEach(link =>
             link.addEventListener('click', e => {
                 e.preventDefault();
@@ -211,12 +221,16 @@ class StockManager {
             })
         );
     
-        // atualiza contagem ao final
         this.updateItemsCount();
     }
 
     getStatusClass(status) {
-        const classes = { 'OK':'status-ok','EM FALTA':'status-falta','VENCIDO':'status-vencido','EM DESCARTE':'status-descarte' };
+        const classes = {
+            'OK': 'status-ok',
+            'EM FALTA': 'status-falta',
+            'VENCIDO': 'status-vencido',
+            'EM DESCARTE': 'status-descarte'
+        };
         return classes[status] || '';
     }
 
@@ -229,12 +243,6 @@ class StockManager {
 const stockManager = new StockManager();
 window.stockManager = stockManager;
 
-// Auto-generate material ID
-document.getElementById('material-name').addEventListener('input', e => {
-    const matId = document.getElementById('material-id');
-    if (!matId.value && e.target.value) matId.value = `MAT-2024-${Date.now().toString().slice(-6)}`;
-});
-
 // Banco de Materiais
 const materiaisDB = [
     { name: "SOLVE TS 500 LTT", code: "79868", desc: "SOLVENTE PARA LIMPEZA MANUAL DE PEÇ" },
@@ -246,38 +254,7 @@ const materiaisDB = [
     { name: "780-BRANCO", code: "7151736", desc: "SELANTE, SILICONE, BRANCO, TIPO S" },
     { name: "780RTV (PRETO)", code: "1453535", desc: "SELANTE, SILICONE, PRETO, TIPO S" },
     { name: "AEROKROIL", code: "7556549", desc: "OLEO PENETRANTE" },
-    { name: "ARDROX AV 15 AEROSOL", code: "2976414", desc: "COMPOSTO INIBIDOR DE CORROSAO" },
-    { name: "AV138-2 BR", code: "2941755", desc: "ADESIVO, EPOXI, AV138, COMP. A" },
-    { name: "BOELUBE", code: "1453546", desc: "LUBRIFICANTE SINTETICO" },
-    { name: "BONDERITE M-CR 1132 AERO", code: "6752518", desc: "SOLUCAO CONVERSAO QUIMICA, CLASS1A" },
-    { name: "CB200-40", code: "7135770", desc: "ADESIVO, ACRILICO" },
-    { name: "COR-BAN 27L", code: "9447580", desc: "COMPOSTO, INIBIDOR DE CORROSAO" },
-    { name: "D-5026NS", code: "6125209", desc: "COMPOSTO, INIBIDOR DE CORROSAO, MIL" },
-    { name: "D-7409", code: "6871644", desc: "FILME LUBRIFICANTE ANTI FRICÇÃO" },
-    { name: "DOUBL CHECK DR-60", code: "1454375", desc: "REMOVEDOR, LIQUIDO, PENETRANTE" },
-    { name: "DOW CORNING 4", code: "1453538", desc: "GRAXA, SILICONE-ISOLANTE ELETRICO" },
-    { name: "EA9320NA", code: "1453275", desc: "ADESIVO, EPOXI, TIPO II" },
-    { name: "EA9396", code: "6578982", desc: "ADESIVO, EPOXI, TIPO III" },
-    { name: "EC1300L", code: "1453274", desc: "ADESIVO, ELASTOMERICO, BORRACHA SINTE" },
-    { name: "EC-460", code: "4770964", desc: "ADESIVO, EPOXI, TIPO IV" },
-    { name: "ES2000", code: "8996985", desc: "SELANTE, POLIURETANO, TRANSPARENTE" },
-    { name: "HT3326-5-50", code: "1453504", desc: "SELANTE, POLIURETANO, VERDE" },
-    { name: "HV998", code: "9120013", desc: "CATALISADOR, ADESIVO AV138, COMP. B" },
-    { name: "JUNTA MOTOR DIESEL", code: "1453507", desc: "ADESIVO, ELASTOMERICO, RESISTENTE A COMB" },
-    { name: "LOCTITE 221", code: "9117446", desc: "ADESIVO, ANAEROBICO, TRAVAMENTO, TIPO I" },
-    { name: "LOCTITE 222", code: "1489797", desc: "ADESIVO, ANAEROBICO, TRAVAMENTO, TIPO II" },
-    { name: "LOCTITE 241", code: "1453510", desc: "ADESIVO, ANAEROBICO, TRAVAMENTO, TIPO III" },
-    { name: "LOCTITE 242", code: "6972486", desc: "ADESIVO, ANAEROBICO, TRAVAMENTO, TIPO IV" },
-    { name: "LOCTITE 601 TORQUE ALTO", code: "2035987", desc: "ADESIVO, ANAEROBICO, FIXADOR TORQUE ALTO" },
-    { name: "NYCOTE 7-11 DARK BLUE", code: "1453381", desc: "REVESTIMENTO ANTI CORROSIVO" },
-    { name: "RTV-162", code: "3742496", desc: "ADESIVO-SELANTE, RTV, SILICONE" },
-    { name: "RTV102", code: "7151869", desc: "SELANTE, SILICONE, BRANCO" },
-    { name: "RTV106", code: "1453286", desc: "SELANTE, SILICONE, VERMELHO" },
-    { name: "RTV108", code: "2957411", desc: "SELANTE, SILICONE, PRETO" },
-    { name: "RTV157", code: "7151825", desc: "SELANTE, SILICONE, CINZA" },
-    { name: "RTV159", code: "9129347", desc: "SELANTE, SILICONE, ALTA TEMP" },
-    { name: "RTV732", code: "1453588", desc: "SELANTE, SILICONE, INCOLOR" },
-    { name: "S1006-KIT-A", code: "5263329", desc: "ADESIVO, EPOXI, CABLAGENS ELETRICAS" }
+    { name: "ARDROX AV 15 AEROSOL", code: "2976414", desc: "COMPOSTO INIBIDOR DE CORROSAO" }
 ];
 
 // Popula selects
@@ -296,13 +273,22 @@ const materiaisDB = [
 // Sincroniza selects
 document.getElementById('material-name').addEventListener('change', () => {
     const match = materiaisDB.find(m => m.name === document.getElementById('material-name').value);
-    if (match) { document.getElementById('material-id').value = match.code; document.getElementById('material-desc').value = match.desc; }
+    if (match) { 
+        document.getElementById('material-id').value = match.code; 
+        document.getElementById('material-desc').value = match.desc; 
+    }
 });
 document.getElementById('material-id').addEventListener('change', () => {
     const match = materiaisDB.find(m => m.code === document.getElementById('material-id').value);
-    if (match) { document.getElementById('material-name').value = match.name; document.getElementById('material-desc').value = match.desc; }
+    if (match) { 
+        document.getElementById('material-name').value = match.name; 
+        document.getElementById('material-desc').value = match.desc; 
+    }
 });
 document.getElementById('material-desc').addEventListener('change', () => {
     const match = materiaisDB.find(m => m.desc === document.getElementById('material-desc').value);
-    if (match) { document.getElementById('material-name').value = match.name; document.getElementById('material-id').value = match.code; }
+    if (match) { 
+        document.getElementById('material-name').value = match.name; 
+        document.getElementById('material-id').value = match.code; 
+    }
 });

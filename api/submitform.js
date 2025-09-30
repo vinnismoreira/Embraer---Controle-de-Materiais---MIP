@@ -20,7 +20,19 @@ export default async function handler(req, res) {
       range: "Sheet1!A:C",
       valueInputOption: "RAW",
       requestBody: {
-        values: [[name, email, message, new Date().toISOString()]]
+        values: [[
+    req.body.name,
+    req.body.ecode,
+    req.body.description,
+    req.body.location,
+    req.body.discardReason,
+    req.body.verificationDate,
+    req.body.expiryDate,
+    req.body.responsible,
+    req.body.quantity,
+    req.body.status,
+    new Date().toISOString() // timestamp
+]]
       }
     });
 
