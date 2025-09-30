@@ -10,7 +10,18 @@ const auth = new google.auth.GoogleAuth({
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
 
-  const { name, email, message } = req.body;
+  const {
+    name,
+    materialId,
+    desc,
+    quantity,
+    status,
+    location,
+    discardReason,
+    verificationDate,
+    expiryDate,
+    responsible
+  } = req.body;
 
   try {
     const client = await auth.getClient();
@@ -21,18 +32,18 @@ export default async function handler(req, res) {
       valueInputOption: "RAW",
       requestBody: {
         values: [[
-    req.body.name,
-    req.body.ecode,
-    req.body.description,
-    req.body.location,
-    req.body.discardReason,
-    req.body.verificationDate,
-    req.body.expiryDate,
-    req.body.responsible,
-    req.body.quantity,
-    req.body.status,
-    new Date().toISOString() // timestamp
-]]
+          name,
+          materialId,
+          desc,
+          location,
+          discardReason,
+          verificationDate,
+          expiryDate,
+          responsible,
+          quantity,
+          status,
+          new Date().toISOString() // timestamp
+        ]]
       }
     });
 
