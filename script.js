@@ -102,17 +102,17 @@ class StockManager {
 
     async saveItem() {
         const formData = {
-            name: document.getElementById('material-name').value,
-            materialId: document.getElementById('material-id').value,
-            desc: document.getElementById('material-desc').value,
-            quantity: parseInt(document.getElementById('quantity').value),
-            status: document.getElementById('status').value,
-            location: document.getElementById('location').value,
-            discardReason: document.getElementById('discard-reason').value,
-            verificationDate: document.getElementById('verification-date').value,
-            expiryDate: document.getElementById('expiry-date').value,
-            responsible: document.getElementById('responsible').value
-        };
+    PN: document.getElementById('material-name').value,
+    ECODE: document.getElementById('material-id').value,
+    DESCRIÇÃO: document.getElementById('material-desc').value,
+    QUANTIDADE: parseInt(document.getElementById('quantity').value),
+    STATUS: document.getElementById('status').value,
+    "LOCALIZAÇÃO NO ESTOQUE": document.getElementById('location').value,
+    "MOTIVO DE DESCARTE": document.getElementById('discard-reason').value,
+    "DATA DE VERIFICAÇÃO": document.getElementById('verification-date').value,
+    "DATA DE VALIDADE": document.getElementById('expiry-date').value,
+    RESPONSÁVEL: document.getElementById('responsible').value
+};
 
         if (this.editingItemId) {
             const idx = this.stockItems.findIndex(i => i.id === this.editingItemId);
