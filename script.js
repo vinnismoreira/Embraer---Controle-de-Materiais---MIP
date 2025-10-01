@@ -140,16 +140,16 @@ class StockManager {
 
         // Envia para Google Sheets
         try {
-            const response = await fetch('/api/saveData', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
-            });
-            const result = await response.json();
-            if (!result.success) console.error('Erro ao enviar para o Google Sheets:', result.error);
-        } catch (err) {
-            console.error('Erro de conexão com o backend:', err);
-        }
+    const response = await fetch("https://script.google.com/macros/s/AKfycbzWwkIc3GvYDJc-Y04bCF_mkLr2uI2_d0BX2n_pczIgq0BZKm6yhgYAEjmlN69e-rM/exec", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+    });
+    const result = await response.json();
+    if (!result.success) console.error('Erro ao enviar para o Google Sheets:', result.error);
+} catch (err) {
+    console.error('Erro de conexão com o Google Apps Script:', err);
+}
     }
 
     deleteItem(itemId) {
