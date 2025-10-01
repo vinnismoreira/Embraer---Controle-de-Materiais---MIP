@@ -102,63 +102,68 @@ class StockManager {
 
     async saveItem() {
     const formData = {
-    "pn": document.getElementById('material-name').value,
-    "ecode": document.getElementById('material-id').value,
-    "descricao": document.getElementById('material-desc').value,
-    "localizacao_no_estoque": document.getElementById('location').value,
-    "motivo_de_descarte": document.getElementById('discard-reason').value,
-    "data_de_verificacao": document.getElementById('verification-date').value,
-    "data_de_validade": document.getElementById('expiry-date').value,
-    "responsavel_pelo_registro": document.getElementById('responsible').value,
-    "quantidade": parseInt(document.getElementById('quantity').value),
-    "status": document.getElementById('status').value
-};
+        name: document.getElementById('material-name').value || "-",
+        materialId: document.getElementById('material-id').value || "-",
+        desc: document.getElementById('material-desc').value || "-",
+        quantity: parseInt(document.getElementById('quantity').value) || 0,
+        status: document.getElementById('status').value || "-",
+        location: document.getElementById('location').value || "-",
+        discardReason: document.getElementById('discard-reason').value || "-",
+        verificationDate: document.getElementById('verification-date').value || "-",
+        expiryDate: document.getElementById('expiry-date').value || "-",
+        responsible: document.getElementById('responsible').value || "-"
+    };
 
-    // Salva localmente (continua igual)
-    if (this.editingItemId) {
-        const idx = this.stockItems.findIndex(i => i.id === this.editingItemId);
-        if (idx !== -1) {
-            this.stockItems[idx] = {
-                ...this.stockItems[idx],
-                ...formData
-            };
-        }
-    } else {
-        this.stockItems.push({
-            id: Date.now().toString(),
-            ...formData
-        });
-    }
 
-    localStorage.setItem('stockItems', JSON.stringify(this.stockItems));
-    this.renderTable();
-    this.updateItemsCount();
-    this.closeModal();
 
-    // --- Envia para o SUPABASE ---
-    try {
-        const response = await fetch('https://mqjhjcdfgksdfxfzfdlk.supabase.co/rest/v1/GESTAO_DE_ESTOQUE', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'apikey': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xamhqY2RmZ2tzZGZ4ZnpmZGxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDQ0MjAsImV4cCI6MjA3NDk4MDQyMH0.Kbw_ai5CndZvJQ8SJEeVjPHIDsp-6flf941kIJpG6XY",
-                'Authorization': "Bearer " + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xamhqY2RmZ2tzZGZ4ZnpmZGxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDQ0MjAsImV4cCI6MjA3NDk4MDQyMH0.Kbw_ai5CndZvJQ8SJEeVjPHIDsp-6flf941kIJpG6XY",
-                'Prefer': 'return=minimal'
-            },
-            body: JSON.stringify(formData)
-        });
-
-        if (!response.ok) {
-            const error = await response.text();
-            console.error("Erro Supabase:", error);
+        if (this.editingItemId) {
+            const idx = this.stockItems.findIndex(i => i.id === this.editingItemId);
+            if (idx !== -1) {
+                this.stockItems[idx] = {
+                    ...this.stockItems[idx],
+                    ...formData,
+                    verifiedBy: formData.responsible,
+                    verifiedDate: new Date(formData.verificationDate).toLocaleDateString('pt-BR')
+                };
+            }
         } else {
-            console.log("Registro salvo no Supabase!");
+            this.stockItems.push({
+                id: Date.now().toString(),
+                ...formData,
+                verifiedBy: formData.responsible,
+                verifiedDate: new Date(formData.verificationDate).toLocaleDateString('pt-BR')
+            });
         }
-    } catch (err) {
-        console.error("Erro de conexão com Supabase:", err);
-    }
-}
 
+        localStorage.setItem('stockItems', JSON.stringify(this.stockItems));
+        this.renderTable();
+        this.updateItemsCount();
+        this.closeModal();
+
+        // --- Envia para Google Sheets via Apps Script ---
+        try {
+            const response = await fetch("SUA_URL_DO_APPS_SCRIPT", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    PN: formData.materialId,
+                    ECODE: formData.materialId,
+                    DESCRIÇÃO: formData.desc,
+                    "LOCALIZAÇÃO NO ESTOQUE": formData.location,
+                    "MOTIVO DE DESCARTE": formData.discardReason,
+                    "DATA DE VERIFICAÇÃO": formData.verificationDate,
+                    "DATA DE VALIDADE": formData.expiryDate,
+                    RESPONSÁVEL: formData.responsible,
+                    QUANTIDADE: formData.quantity,
+                    STATUS: formData.status
+                })
+            });
+            const result = await response.json();
+            if (result.status !== "OK") console.error('Erro ao enviar para o Google Sheets:', result);
+        } catch (err) {
+            console.error('Erro de conexão com o Apps Script:', err);
+        }
+    }
 
     deleteItem(itemId) {
         if (!confirm('Deseja realmente remover este item?')) return;
@@ -179,6 +184,7 @@ class StockManager {
     }
 
     renderTable() {
+        if (!Array.isArray(filtered)) return;
         const tbody = document.getElementById('stock-table-body');
         const noItemsMsg = document.getElementById('no-items-message');
         const filtered = this.getFilteredItems();
@@ -195,17 +201,17 @@ class StockManager {
         filtered.forEach(item => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${item.name || '-'}</td>
-                <td>${item.materialId || '-'}</td>
-                <td>${item.quantity ?? '-'}</td>
-                <td>${item.responsible || item.verifiedBy || '-'}</td>
-                <td>
-                    <span class="status-badge ${this.getStatusClass(item.status)}">
-                        ${item.status || '-'}
-                    </span>
-                </td>
-                <td>${item.discardReason || '-'}</td>
-                <td>
+                <td>${item.name ?? '-'}</td>
+<td>${item.materialId ?? '-'}</td>
+<td>${item.quantity ?? '-'}</td>
+<td>${item.responsible ?? '-'}</td>
+<td>
+    <span class="status-badge ${this.getStatusClass(item.status)}">
+        ${item.status ?? '-'}
+    </span>
+</td>
+<td>${item.discardReason ?? '-'}</td>
+
                     <a href="#" class="action-link action-edit" data-id="${item.id}">Editar</a>
                     <a href="#" class="action-link action-delete" data-id="${item.id}">Excluir</a>
                 </td>
@@ -330,4 +336,3 @@ document.getElementById('material-desc').addEventListener('change', () => {
         document.getElementById('material-name').value = match.name; 
         document.getElementById('material-id').value = match.code; 
     }
-});
