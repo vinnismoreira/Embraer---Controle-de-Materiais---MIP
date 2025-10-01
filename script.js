@@ -140,7 +140,7 @@ class StockManager {
 
         // Envia para Google Sheets
         try {
-            const response = await fetch('/api/submitForm', {
+            const response = await fetch('/api/saveData', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
