@@ -102,17 +102,17 @@ class StockManager {
 
     async saveItem() {
         const formData = {
-    PN: document.getElementById('material-name').value,
-    ECODE: document.getElementById('material-id').value,
-    DESCRIÇÃO: document.getElementById('material-desc').value,
-    QUANTIDADE: parseInt(document.getElementById('quantity').value),
-    STATUS: document.getElementById('status').value,
-    "LOCALIZAÇÃO NO ESTOQUE": document.getElementById('location').value,
-    "MOTIVO DE DESCARTE": document.getElementById('discard-reason').value,
-    "DATA DE VERIFICAÇÃO": document.getElementById('verification-date').value,
-    "DATA DE VALIDADE": document.getElementById('expiry-date').value,
-    RESPONSÁVEL: document.getElementById('responsible').value
-};
+            name: document.getElementById('material-name').value,
+            materialId: document.getElementById('material-id').value,
+            desc: document.getElementById('material-desc').value,
+            quantity: parseInt(document.getElementById('quantity').value),
+            status: document.getElementById('status').value,
+            location: document.getElementById('location').value,
+            discardReason: document.getElementById('discard-reason').value,
+            verificationDate: document.getElementById('verification-date').value,
+            expiryDate: document.getElementById('expiry-date').value,
+            responsible: document.getElementById('responsible').value
+        };
 
         if (this.editingItemId) {
             const idx = this.stockItems.findIndex(i => i.id === this.editingItemId);
@@ -138,18 +138,29 @@ class StockManager {
         this.updateItemsCount();
         this.closeModal();
 
-        // Envia para Google Sheets
+        // --- Envia para Google Sheets via Apps Script ---
         try {
-    const response = await fetch("https://script.google.com/macros/s/AKfycbw_Pug1cE2-0W_E4pblwz3Zw-q2MNb9V4FZvJ1qZgg1pl8yJifBZlzxY1iL0xv5f-6i-w/exec", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-    });
-    const result = await response.json();
-    if (!result.success) console.error('Erro ao enviar para o Google Sheets:', result.error);
-} catch (err) {
-    console.error('Erro de conexão com o Google Apps Script:', err);
-}
+            const response = await fetch("https://script.google.com/macros/s/AKfycbw_Pug1cE2-0W_E4pblwz3Zw-q2MNb9V4FZvJ1qZgg1pl8yJifBZlzxY1iL0xv5f-6i-w/exec", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    PN: formData.materialId,
+                    ECODE: formData.materialId,
+                    DESCRIÇÃO: formData.desc,
+                    "LOCALIZAÇÃO NO ESTOQUE": formData.location,
+                    "MOTIVO DE DESCARTE": formData.discardReason,
+                    "DATA DE VERIFICAÇÃO": formData.verificationDate,
+                    "DATA DE VALIDADE": formData.expiryDate,
+                    RESPONSÁVEL: formData.responsible,
+                    QUANTIDADE: formData.quantity,
+                    STATUS: formData.status
+                })
+            });
+            const result = await response.json();
+            if (result.status !== "OK") console.error('Erro ao enviar para o Google Sheets:', result);
+        } catch (err) {
+            console.error('Erro de conexão com o Apps Script:', err);
+        }
     }
 
     deleteItem(itemId) {
