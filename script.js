@@ -140,7 +140,7 @@ class StockManager {
 
         // Envia para Google Sheets
         try {
-    const response = await fetch("https://script.google.com/macros/s/AKfycbzWwkIc3GvYDJc-Y04bCF_mkLr2uI2_d0BX2n_pczIgq0BZKm6yhgYAEjmlN69e-rM/exec", {
+    const response = await fetch("https://script.google.com/macros/s/AKfycbw_Pug1cE2-0W_E4pblwz3Zw-q2MNb9V4FZvJ1qZgg1pl8yJifBZlzxY1iL0xv5f-6i-w/exec", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
