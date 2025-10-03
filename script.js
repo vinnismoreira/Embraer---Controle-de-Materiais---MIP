@@ -1,11 +1,3 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js";
-
-// === CONFIGURAÇÃO SUPABASE ===
-const supabase = createClient(
-  "https://mqjhjcdfgksdfxfzfdlk.supabase.co", // sua URL do Supabase
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xamhqY2RmZ2tzZGZ4ZnpmZGxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDQ0MjAsImV4cCI6MjA3NDk4MDQyMH0.Kbw_ai5CndZvJQ8SJEeVjPHIDsp-6flf941kIJpG6XY"                    // sua anon key
-);
-
 // === Banco de Materiais ===
 const materiaisDB = [
     { name: "SOLVE TS 500 LTT", code: "79868", desc: "SOLVENTE PARA LIMPEZA MANUAL DE PEÇ" },
@@ -105,21 +97,7 @@ function sincronizarSelects() {
     });
 }
 
-// === Função para salvar dados no Supabase ===
-async function salvarNoSupabase(dados) {
-    const { data, error } = await supabase
-        .from("registros")
-        .insert([dados]);
-
-    if (error) {
-        console.error("Erro ao salvar:", error);
-        alert("❌ Erro ao salvar dados");
-        return false;
-    }
-    return true;
-}
-
-// === Classe StockManager ===
+// === Classe StockManager com cores restauradas ===
 class StockManager {
     constructor() {
         this.stockItems = JSON.parse(localStorage.getItem('stockItems')) || [];
@@ -154,53 +132,140 @@ class StockManager {
             this.renderTable();
         });
 
+        document.getElementById('item-form').addEventListener('input', () => this.validateForm());
+
         document.getElementById('item-modal').addEventListener('click', e => {
             if (e.target.id === 'item-modal') this.closeModal();
+        });
+
+        document.getElementById('material-name').addEventListener('input', e => {
+            const matId = document.getElementById('material-id');
+            if (!matId.value && e.target.value) matId.value = `MAT-2024-${Date.now().toString().slice(-6)}`;
         });
     }
 
     openModal(itemId = null) {
         this.editingItemId = itemId;
-        document.getElementById('item-modal').classList.add('active');
+        const modal = document.getElementById('item-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalDescription = document.getElementById('modal-description');
+
+        if (itemId) {
+            modalTitle.textContent = 'Editar Item';
+            modalDescription.textContent = 'Edite as informações do item selecionado.';
+            this.loadItemData(itemId);
+        } else {
+            modalTitle.textContent = 'Anotar Novo Registro';
+            modalDescription.textContent = 'Adicione um novo registro ao estoque preenchendo as informações abaixo.';
+            this.clearForm();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('verification-date').value = today;
+        }
+
+        modal.classList.add('active');
+        this.validateForm();
     }
 
     closeModal() {
         document.getElementById('item-modal').classList.remove('active');
+        this.editingItemId = null;
         this.clearForm();
+    }
+
+    loadItemData(itemId) {
+        const item = this.stockItems.find(i => i.id === itemId);
+        if (!item) return;
+        document.getElementById('material-name').value = item.name;
+        document.getElementById('material-id').value = item.materialId;
+        document.getElementById('material-desc').value = item.desc || '';
+        document.getElementById('quantity').value = item.quantity;
+        document.getElementById('status').value = item.status;
+        document.getElementById('location').value = item.location;
+        document.getElementById('discard-reason').value = item.discardReason || '';
+        document.getElementById('verification-date').value = item.verificationDate || '';
+        document.getElementById('expiry-date').value = item.expiryDate || '';
+        document.getElementById('responsible').value = item.responsible;
     }
 
     clearForm() {
         document.getElementById('item-form').reset();
+        this.validateForm();
+    }
+
+    validateForm() {
+        const required = ['material-name','material-id','quantity','status','location','verification-date','responsible'];
+        const isValid = required.every(id => document.getElementById(id).value.trim() !== '');
+        document.getElementById('save-item-btn').disabled = !isValid;
     }
 
     async saveItem() {
         const formData = {
-            material: document.getElementById('material-name').value || "-",
-            material_id: document.getElementById('material-id').value || "-",
-            descricao: document.getElementById('material-desc').value || "-",
-            quantidade: parseInt(document.getElementById('quantity').value) || 0,
+            name: document.getElementById('material-name').value || "-",
+            materialId: document.getElementById('material-id').value || "-",
+            desc: document.getElementById('material-desc').value || "-",
+            quantity: parseInt(document.getElementById('quantity').value) || 0,
             status: document.getElementById('status').value || "-",
-            localizacao: document.getElementById('location').value || "-",
-            motivo_descartado: document.getElementById('discard-reason').value || "-",
-            data_verificacao: document.getElementById('verification-date').value || "-",
-            data_validade: document.getElementById('expiry-date').value || "-",
-            responsavel: document.getElementById('responsible').value || "-"
+            location: document.getElementById('location').value || "-",
+            discardReason: document.getElementById('discard-reason').value || "-",
+            verificationDate: document.getElementById('verification-date').value || "-",
+            expiryDate: document.getElementById('expiry-date').value || "-",
+            responsible: document.getElementById('responsible').value || "-"
         };
 
-        // Salvar localmente
         if (this.editingItemId) {
             const idx = this.stockItems.findIndex(i => i.id === this.editingItemId);
-            if (idx !== -1) this.stockItems[idx] = { id: this.editingItemId, ...formData };
+            if (idx !== -1) {
+                this.stockItems[idx] = {
+                    ...this.stockItems[idx],
+                    ...formData,
+                    verifiedBy: formData.responsible,
+                    verifiedDate: new Date(formData.verificationDate).toLocaleDateString('pt-BR')
+                };
+            }
         } else {
-            this.stockItems.push({ id: Date.now().toString(), ...formData });
+            this.stockItems.push({
+                id: Date.now().toString(),
+                ...formData,
+                verifiedBy: formData.responsible,
+                verifiedDate: new Date(formData.verificationDate).toLocaleDateString('pt-BR')
+            });
         }
+
         localStorage.setItem('stockItems', JSON.stringify(this.stockItems));
         this.renderTable();
-
-        // Salvar no Supabase
-        await salvarNoSupabase(formData);
-
+        this.updateItemsCount();
         this.closeModal();
+
+        try {
+            const response = await fetch("SUA_URL_DO_APPS_SCRIPT", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    PN: formData.materialId,
+                    ECODE: formData.materialId,
+                    DESCRIÇÃO: formData.desc,
+                    "LOCALIZAÇÃO NO ESTOQUE": formData.location,
+                    "MOTIVO DE DESCARTE": formData.discardReason,
+                    "DATA DE VERIFICAÇÃO": formData.verificationDate,
+                    "DATA DE VALIDADE": formData.expiryDate,
+                    RESPONSÁVEL: formData.responsible,
+                    QUANTIDADE: formData.quantity,
+                    STATUS: formData.status
+                })
+            });
+            const result = await response.json();
+            if (result.status !== "OK") console.error('Erro ao enviar para o Google Sheets:', result);
+        } catch (err) {
+            console.error('Erro de conexão com o Apps Script:', err);
+        }
+    }
+
+    deleteItem(itemId) {
+        if (!confirm('Deseja realmente remover este item?')) return;
+        this.stockItems = this.stockItems.filter(i => i.id !== itemId);
+        localStorage.setItem('stockItems', JSON.stringify(this.stockItems));
+        this.renderTable();
+        this.updateItemsCount();
     }
 
     getFilteredItems() {
@@ -208,35 +273,78 @@ class StockManager {
         if (this.currentFilter !== 'ALL') filtered = filtered.filter(i => i.status === this.currentFilter);
         if (this.currentSearch) {
             const term = this.currentSearch.toLowerCase();
-            filtered = filtered.filter(i => i.material.toLowerCase().includes(term) || i.material_id.toLowerCase().includes(term));
+            filtered = filtered.filter(i => i.name.toLowerCase().includes(term) || i.materialId.toLowerCase().includes(term));
         }
         return filtered;
     }
 
     renderTable() {
         const tbody = document.getElementById('stock-table-body');
-        tbody.innerHTML = "";
+        const noItemsMsg = document.getElementById('no-items-message');
         const filtered = this.getFilteredItems();
+
+        if (!filtered.length) {
+            tbody.innerHTML = '';
+            noItemsMsg.style.display = 'block';
+            document.getElementById('items-count').textContent = `Exibindo 0 de ${this.stockItems.length} itens`;
+            return;
+        }
+
+        noItemsMsg.style.display = 'none';
+        tbody.innerHTML = '';
+
         filtered.forEach(item => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td>${item.material}</td>
-                <td>${item.material_id}</td>
-                <td>${item.quantidade}</td>
-                <td>${item.responsavel}</td>
-                <td>${item.status}</td>
-                <td>${item.motivo_descartado}</td>
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.name ?? '-'}</td>
+                <td>${item.materialId ?? '-'}</td>
+                <td>${item.quantity ?? '-'}</td>
+                <td>${item.responsible ?? '-'}</td>
                 <td>
-                    <a href="#" class="action-edit" data-id="${item.id}">Editar</a>
-                    <a href="#" class="action-delete" data-id="${item.id}">Excluir</a>
+                    <span class="status-badge ${this.getStatusClass(item.status)}">
+                        ${item.status ?? '-'}
+                    </span>
+                </td>
+                <td>${item.discardReason ?? '-'}</td>
+                <td>
+                    <a href="#" class="action-link action-edit" data-id="${item.id}">Editar</a>
+                    <a href="#" class="action-link action-delete" data-id="${item.id}">Excluir</a>
                 </td>
             `;
-            tbody.appendChild(tr);
+            tbody.appendChild(row);
         });
+
+        tbody.querySelectorAll('.action-edit').forEach(link =>
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const id = e.currentTarget.dataset.id;
+                this.openModal(id);
+            })
+        );
+
+        tbody.querySelectorAll('.action-delete').forEach(link =>
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const id = e.currentTarget.dataset.id;
+                this.deleteItem(id);
+            })
+        );
+
+        this.updateItemsCount();
+    }
+
+    getStatusClass(status) {
+        const classes = {
+            'OK': 'status-ok',
+            'EM FALTA': 'status-falta',
+            'VENCIDO': 'status-vencido',
+            'EM DESCARTE': 'status-descarte'
+        };
+        return classes[status] || '';
     }
 
     updateItemsCount() {
-        document.getElementById('items-count').textContent = `${this.getFilteredItems().length} itens`;
+        document.getElementById('items-count').textContent = `Exibindo ${this.getFilteredItems().length} de ${this.stockItems.length} itens`;
     }
 }
 
