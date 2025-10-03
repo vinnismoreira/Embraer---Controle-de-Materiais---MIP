@@ -1,3 +1,11 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js";
+
+// ⚡ CONFIGURAÇÃO DO SUPABASE
+const supabase = createClient(
+  "https://mqjhjcdfgksdfxfzfdlk.supabase.co", // sua URL do Supabase
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xamhqY2RmZ2tzZGZ4ZnpmZGxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDQ0MjAsImV4cCI6MjA3NDk4MDQyMH0.Kbw_ai5CndZvJQ8SJEeVjPHIDsp-6flf941kIJpG6XY"                    // sua anon key
+);
+
 // === Banco de Materiais ===
 const materiaisDB = [
     { name: "SOLVE TS 500 LTT", code: "79868", desc: "SOLVENTE PARA LIMPEZA MANUAL DE PEÇ" },
@@ -43,7 +51,7 @@ const materiaisDB = [
     { name: "S1006-KIT-A", code: "5263329", desc: "ADESIVO, EPOXI, CABLAGENS ELETRICAS" }
 ];
 
-// === Função para carregar selects ===
+// === Carregar selects ===
 function carregarMateriais() {
     const nameSelect = document.getElementById('material-name');
     const codeSelect = document.getElementById('material-id');
@@ -54,24 +62,13 @@ function carregarMateriais() {
     });
 
     materiaisDB.forEach(m => {
-        let optName = document.createElement('option');
-        optName.value = m.name;
-        optName.textContent = m.name;
-        nameSelect.appendChild(optName);
-
-        let optCode = document.createElement('option');
-        optCode.value = m.code;
-        optCode.textContent = m.code;
-        codeSelect.appendChild(optCode);
-
-        let optDesc = document.createElement('option');
-        optDesc.value = m.desc;
-        optDesc.textContent = m.desc;
-        descSelect.appendChild(optDesc);
+        nameSelect.appendChild(new Option(m.name, m.name));
+        codeSelect.appendChild(new Option(m.code, m.code));
+        descSelect.appendChild(new Option(m.desc, m.desc));
     });
 }
 
-// === Sincronização entre selects ===
+// === Sincronizar selects ===
 function sincronizarSelects() {
     document.getElementById('material-name').addEventListener('change', () => {
         const match = materiaisDB.find(m => m.name === document.getElementById('material-name').value);
@@ -81,7 +78,7 @@ function sincronizarSelects() {
         }
     });
     document.getElementById('material-id').addEventListener('change', () => {
-        const match = materiaisDB.find(m => m.code === document.getElementById('material-id').value);
+        const match = materiaisDB.find(m => m.code.toString() === document.getElementById('material-id').value);
         if (match) {
             document.getElementById('material-name').value = match.name;
             document.getElementById('material-desc').value = match.desc;
@@ -97,7 +94,7 @@ function sincronizarSelects() {
     });
 }
 
-// === Classe StockManager com cores restauradas ===
+// === Classe StockManager (corrigida) ===
 class StockManager {
     constructor() {
         this.stockItems = JSON.parse(localStorage.getItem('stockItems')) || [];
@@ -111,8 +108,7 @@ class StockManager {
         this.bindEvents();
         this.renderTable();
         this.updateItemsCount();
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('verification-date').value = today;
+        document.getElementById('verification-date').value = new Date().toISOString().split('T')[0];
     }
 
     bindEvents() {
@@ -140,7 +136,13 @@ class StockManager {
 
         document.getElementById('material-name').addEventListener('input', e => {
             const matId = document.getElementById('material-id');
-            if (!matId.value && e.target.value) matId.value = `MAT-2024-${Date.now().toString().slice(-6)}`;
+            const match = materiaisDB.find(m => m.name === e.target.value);
+            if (match) {
+                matId.value = match.code;
+                document.getElementById('material-desc').value = match.desc;
+            } else if (!matId.value) {
+                matId.value = `MAT-2024-${Date.now().toString().slice(-6)}`;
+            }
         });
     }
 
@@ -158,8 +160,6 @@ class StockManager {
             modalTitle.textContent = 'Anotar Novo Registro';
             modalDescription.textContent = 'Adicione um novo registro ao estoque preenchendo as informações abaixo.';
             this.clearForm();
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('verification-date').value = today;
         }
 
         modal.classList.add('active');
@@ -177,13 +177,13 @@ class StockManager {
         if (!item) return;
         document.getElementById('material-name').value = item.name;
         document.getElementById('material-id').value = item.materialId;
-        document.getElementById('material-desc').value = item.desc || '';
+        document.getElementById('material-desc').value = item.desc;
         document.getElementById('quantity').value = item.quantity;
         document.getElementById('status').value = item.status;
         document.getElementById('location').value = item.location;
-        document.getElementById('discard-reason').value = item.discardReason || '';
-        document.getElementById('verification-date').value = item.verificationDate || '';
-        document.getElementById('expiry-date').value = item.expiryDate || '';
+        document.getElementById('discard-reason').value = item.discardReason;
+        document.getElementById('verification-date').value = item.verificationDate;
+        document.getElementById('expiry-date').value = item.expiryDate;
         document.getElementById('responsible').value = item.responsible;
     }
 
@@ -194,8 +194,7 @@ class StockManager {
 
     validateForm() {
         const required = ['material-name','material-id','quantity','status','location','verification-date','responsible'];
-        const isValid = required.every(id => document.getElementById(id).value.trim() !== '');
-        document.getElementById('save-item-btn').disabled = !isValid;
+        document.getElementById('save-item-btn').disabled = !required.every(id => document.getElementById(id).value.trim() !== '');
     }
 
     async saveItem() {
@@ -214,28 +213,31 @@ class StockManager {
 
         if (this.editingItemId) {
             const idx = this.stockItems.findIndex(i => i.id === this.editingItemId);
-            if (idx !== -1) {
-                this.stockItems[idx] = {
-                    ...this.stockItems[idx],
-                    ...formData,
-                    verifiedBy: formData.responsible,
-                    verifiedDate: new Date(formData.verificationDate).toLocaleDateString('pt-BR')
-                };
-            }
+            if (idx !== -1) this.stockItems[idx] = { id: this.editingItemId, ...formData };
         } else {
-            this.stockItems.push({
-                id: Date.now().toString(),
-                ...formData,
-                verifiedBy: formData.responsible,
-                verifiedDate: new Date(formData.verificationDate).toLocaleDateString('pt-BR')
-            });
+            this.stockItems.push({ id: Date.now().toString(), ...formData });
         }
-
         localStorage.setItem('stockItems', JSON.stringify(this.stockItems));
         this.renderTable();
-        this.updateItemsCount();
-        this.closeModal();
 
+        // Salvar no Supabase
+        const { data, error } = await supabase
+            .from("registros")
+            .insert([{
+                name: formData.name,
+                material_id: formData.materialId,
+                descricao: formData.desc,
+                quantidade: formData.quantity,
+                status: formData.status,
+                localizacao: formData.location,
+                motivo_descartado: formData.discardReason,
+                data_verificacao: formData.verificationDate,
+                data_validade: formData.expiryDate,
+                responsavel: formData.responsible
+            }]);
+        if (error) console.error("Erro ao salvar no Supabase:", error);
+
+        // Enviar para Google Sheets
         try {
             const response = await fetch("SUA_URL_DO_APPS_SCRIPT", {
                 method: 'POST',
@@ -254,10 +256,12 @@ class StockManager {
                 })
             });
             const result = await response.json();
-            if (result.status !== "OK") console.error('Erro ao enviar para o Google Sheets:', result);
+            if (result.status !== "OK") console.error('Erro no Google Sheets:', result);
         } catch (err) {
-            console.error('Erro de conexão com o Apps Script:', err);
+            console.error('Erro conexão Apps Script:', err);
         }
+
+        this.closeModal();
     }
 
     deleteItem(itemId) {
@@ -265,7 +269,6 @@ class StockManager {
         this.stockItems = this.stockItems.filter(i => i.id !== itemId);
         localStorage.setItem('stockItems', JSON.stringify(this.stockItems));
         this.renderTable();
-        this.updateItemsCount();
     }
 
     getFilteredItems() {
@@ -283,74 +286,61 @@ class StockManager {
         const noItemsMsg = document.getElementById('no-items-message');
         const filtered = this.getFilteredItems();
 
-        if (!filtered.length) {
-            tbody.innerHTML = '';
-            noItemsMsg.style.display = 'block';
-            document.getElementById('items-count').textContent = `Exibindo 0 de ${this.stockItems.length} itens`;
-            return;
-        }
-
-        noItemsMsg.style.display = 'none';
         tbody.innerHTML = '';
-
-        filtered.forEach(item => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${item.name ?? '-'}</td>
-                <td>${item.materialId ?? '-'}</td>
-                <td>${item.quantity ?? '-'}</td>
-                <td>${item.responsible ?? '-'}</td>
-                <td>
-                    <span class="status-badge ${this.getStatusClass(item.status)}">
-                        ${item.status ?? '-'}
-                    </span>
-                </td>
-                <td>${item.discardReason ?? '-'}</td>
-                <td>
-                    <a href="#" class="action-link action-edit" data-id="${item.id}">Editar</a>
-                    <a href="#" class="action-link action-delete" data-id="${item.id}">Excluir</a>
-                </td>
-            `;
-            tbody.appendChild(row);
-        });
-
-        tbody.querySelectorAll('.action-edit').forEach(link =>
-            link.addEventListener('click', e => {
-                e.preventDefault();
-                const id = e.currentTarget.dataset.id;
-                this.openModal(id);
-            })
-        );
-
-        tbody.querySelectorAll('.action-delete').forEach(link =>
-            link.addEventListener('click', e => {
-                e.preventDefault();
-                const id = e.currentTarget.dataset.id;
-                this.deleteItem(id);
-            })
-        );
-
+        if (!filtered.length) {
+            noItemsMsg.style.display = 'block';
+        } else {
+            noItemsMsg.style.display = 'none';
+            filtered.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.materialId}</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.responsible}</td>
+                    <td><span class="status-badge ${this.getStatusClass(item.status)}">${item.status}</span></td>
+                    <td>${item.discardReason}</td>
+                    <td>
+                        <a href="#" class="action-link action-edit" data-id="${item.id}">Editar</a>
+                        <a href="#" class="action-link action-delete" data-id="${item.id}">Excluir</a>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
         this.updateItemsCount();
+
+        tbody.querySelectorAll('.action-edit').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                this.openModal(e.currentTarget.dataset.id);
+            });
+        });
+        tbody.querySelectorAll('.action-delete').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                this.deleteItem(e.currentTarget.dataset.id);
+            });
+        });
     }
 
     getStatusClass(status) {
         const classes = {
             'OK': 'status-ok',
-            'EM FALTA': 'status-falta',
-            'VENCIDO': 'status-vencido',
-            'EM DESCARTE': 'status-descarte'
+            'ALERT': 'status-alert',
+            'EXPIRED': 'status-expired'
         };
         return classes[status] || '';
     }
 
     updateItemsCount() {
-        document.getElementById('items-count').textContent = `Exibindo ${this.getFilteredItems().length} de ${this.stockItems.length} itens`;
+        document.getElementById('items-count').textContent = this.stockItems.length;
     }
 }
 
-// === Inicialização ===
+// === Inicializar ===
 document.addEventListener('DOMContentLoaded', () => {
     carregarMateriais();
     sincronizarSelects();
-    window.stockManager = new StockManager();
+    const manager = new StockManager();
 });
