@@ -125,33 +125,41 @@ class StockManager {
     }
 
     bindEvents() {
-        document.getElementById('add-item-btn').addEventListener('click', () => this.openModal());
-        document.getElementById('close-modal-btn').addEventListener('click', () => this.closeModal());
-        document.getElementById('cancel-modal-btn').addEventListener('click', () => this.closeModal());
-        document.getElementById('save-item-btn').addEventListener('click', () => this.saveItem());
-        document.getElementById('clear-form-btn').addEventListener('click', () => this.clearForm());
+    document.getElementById('add-item-btn').addEventListener('click', () => this.openModal());
+    document.getElementById('close-modal-btn').addEventListener('click', () => this.closeModal());
+    document.getElementById('cancel-modal-btn').addEventListener('click', () => this.closeModal());
+    // ❌ Remova este: document.getElementById('save-item-btn').addEventListener('click', () => this.saveItem());
 
-        document.getElementById('search-input').addEventListener('input', e => {
-            this.currentSearch = e.target.value;
-            this.renderTable();
-        });
+    // ✅ Use o evento de submit do formulário
+    document.getElementById('item-form').addEventListener('submit', async (e) => {
+        e.preventDefault(); // impede reload
+        await this.saveItem();
+    });
 
-        document.getElementById('status-filter').addEventListener('change', e => {
-            this.currentFilter = e.target.value;
-            this.renderTable();
-        });
+    document.getElementById('clear-form-btn').addEventListener('click', () => this.clearForm());
 
-        document.getElementById('item-form').addEventListener('input', () => this.validateForm());
+    document.getElementById('search-input').addEventListener('input', e => {
+        this.currentSearch = e.target.value;
+        this.renderTable();
+    });
 
-        document.getElementById('item-modal').addEventListener('click', e => {
-            if (e.target.id === 'item-modal') this.closeModal();
-        });
+    document.getElementById('status-filter').addEventListener('change', e => {
+        this.currentFilter = e.target.value;
+        this.renderTable();
+    });
 
-        document.getElementById('material-name').addEventListener('input', e => {
-            const matId = document.getElementById('material-id');
-            if (!matId.value && e.target.value) matId.value = `MAT-2024-${Date.now().toString().slice(-6)}`;
-        });
-    }
+    document.getElementById('item-form').addEventListener('input', () => this.validateForm());
+
+    document.getElementById('item-modal').addEventListener('click', e => {
+        if (e.target.id === 'item-modal') this.closeModal();
+    });
+
+    document.getElementById('material-name').addEventListener('input', e => {
+        const matId = document.getElementById('material-id');
+        if (!matId.value && e.target.value) matId.value = `MAT-2024-${Date.now().toString().slice(-6)}`;
+    });
+}
+
 
     async loadFromSupabase() {
         const { data, error } = await supabase.from("stock_items").select("*");
@@ -163,37 +171,40 @@ class StockManager {
     }
 
     async saveItem() {
-        const formData = {
-            name: document.getElementById('material-name').value || "-",
-            materialId: document.getElementById('material-id').value || "-",
-            desc: document.getElementById('material-desc').value || "-",
-            quantity: parseInt(document.getElementById('quantity').value) || 0,
-            status: document.getElementById('status').value || "-",
-            location: document.getElementById('location').value || "-",
-            discardReason: document.getElementById('discard-reason').value || "-",
-            verificationDate: document.getElementById('verification-date').value || "-",
-            expiryDate: document.getElementById('expiry-date').value || "-",
-            responsible: document.getElementById('responsible').value || "-",
-            verifiedBy: document.getElementById('responsible').value || "-",
-            verifiedDate: new Date(document.getElementById('verification-date').value).toLocaleDateString('pt-BR')
-        };
+    const formData = {
+        name: document.getElementById('material-name').value || "-",
+        materialId: document.getElementById('material-id').value || "-",
+        desc: document.getElementById('material-desc').value || "-",
+        quantity: parseInt(document.getElementById('quantity').value) || 0,
+        status: document.getElementById('status').value || "-",
+        location: document.getElementById('location').value || "-",
+        discardReason: document.getElementById('discard-reason').value || "-",
+        verificationDate: document.getElementById('verification-date').value || "-",
+        expiryDate: document.getElementById('expiry-date').value || "-",
+        responsible: document.getElementById('responsible').value || "-",
+        verifiedBy: document.getElementById('responsible').value || "-",
+        verifiedDate: new Date(document.getElementById('verification-date').value).toLocaleDateString('pt-BR')
+    };
 
-        let result;
-        if (this.editingItemId) {
-            result = await supabase.from("stock_items").update(formData).eq("id", this.editingItemId);
-        } else {
-            result = await supabase.from("stock_items").insert([formData]);
-        }
-
-        if (result.error) {
-            console.error("Erro ao salvar no Supabase:", result.error);
-        } else {
-            await this.loadFromSupabase();
-            this.renderTable();
-            this.updateItemsCount();
-            this.closeModal();
-        }
+    let result;
+    if (this.editingItemId) {
+        result = await supabase.from("stock_items").update(formData).eq("id", this.editingItemId);
+    } else {
+        result = await supabase.from("stock_items").insert([formData]);
     }
+
+    if (result.error) {
+        console.error("❌ Erro ao salvar no Supabase:", result.error);
+        alert("Erro ao salvar no banco: " + result.error.message);
+        return;
+    }
+
+    await this.loadFromSupabase();
+    this.renderTable();
+    this.updateItemsCount();
+    this.closeModal();
+}
+
 
     async deleteItem(itemId) {
         if (!confirm('Deseja realmente remover este item?')) return;
