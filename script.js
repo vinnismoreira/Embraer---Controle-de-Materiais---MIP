@@ -51,7 +51,7 @@ const materiaisDB = [
     { name: "S1006-KIT-A", code: "5263329", desc: "ADESIVO, EPOXI, CABLAGENS ELETRICAS" }
 ];
 
-// === Carregar selects ===
+// === Função para carregar selects ===
 function carregarMateriais() {
     const nameSelect = document.getElementById('material-name');
     const codeSelect = document.getElementById('material-id');
@@ -62,13 +62,24 @@ function carregarMateriais() {
     });
 
     materiaisDB.forEach(m => {
-        nameSelect.appendChild(new Option(m.name, m.name));
-        codeSelect.appendChild(new Option(m.code, m.code));
-        descSelect.appendChild(new Option(m.desc, m.desc));
+        let optName = document.createElement('option');
+        optName.value = m.name;
+        optName.textContent = m.name;
+        nameSelect.appendChild(optName);
+
+        let optCode = document.createElement('option');
+        optCode.value = m.code;
+        optCode.textContent = m.code;
+        codeSelect.appendChild(optCode);
+
+        let optDesc = document.createElement('option');
+        optDesc.value = m.desc;
+        optDesc.textContent = m.desc;
+        descSelect.appendChild(optDesc);
     });
 }
 
-// === Sincronizar selects ===
+// === Sincronização entre selects ===
 function sincronizarSelects() {
     document.getElementById('material-name').addEventListener('change', () => {
         const match = materiaisDB.find(m => m.name === document.getElementById('material-name').value);
@@ -78,7 +89,7 @@ function sincronizarSelects() {
         }
     });
     document.getElementById('material-id').addEventListener('change', () => {
-        const match = materiaisDB.find(m => m.code.toString() === document.getElementById('material-id').value);
+        const match = materiaisDB.find(m => m.code === document.getElementById('material-id').value);
         if (match) {
             document.getElementById('material-name').value = match.name;
             document.getElementById('material-desc').value = match.desc;
@@ -94,7 +105,7 @@ function sincronizarSelects() {
     });
 }
 
-// === Classe StockManager (corrigida) ===
+// === Classe StockManager ===
 class StockManager {
     constructor() {
         this.stockItems = JSON.parse(localStorage.getItem('stockItems')) || [];
@@ -111,60 +122,67 @@ class StockManager {
         document.getElementById('verification-date').value = new Date().toISOString().split('T')[0];
     }
 
-   bindEvents() {
-    document.getElementById('add-item-btn').addEventListener('click', () => {
-        this.openModal();
-    });
-    document.getElementById('close-modal-btn').addEventListener('click', () => this.closeModal());
-    document.getElementById('cancel-modal-btn').addEventListener('click', () => this.closeModal());
-    document.getElementById('save-item-btn').addEventListener('click', () => this.saveItem());
-    document.getElementById('clear-form-btn').addEventListener('click', () => this.clearForm());
+    bindEvents() {
+        const addBtn = document.getElementById('add-item-btn');
+        const closeBtn = document.getElementById('close-modal-btn');
+        const cancelBtn = document.getElementById('cancel-modal-btn');
+        const saveBtn = document.getElementById('save-item-btn');
+        const clearBtn = document.getElementById('clear-form-btn');
 
-    document.getElementById('search-input').addEventListener('input', e => {
-        this.currentSearch = e.target.value;
-        this.renderTable();
-    });
+        if (addBtn) addBtn.addEventListener('click', () => this.openModal());
+        if (closeBtn) closeBtn.addEventListener('click', () => this.closeModal());
+        if (cancelBtn) cancelBtn.addEventListener('click', () => this.closeModal());
+        if (saveBtn) saveBtn.addEventListener('click', () => this.saveItem());
+        if (clearBtn) clearBtn.addEventListener('click', () => this.clearForm());
 
-    document.getElementById('status-filter').addEventListener('change', e => {
-        this.currentFilter = e.target.value;
-        this.renderTable();
-    });
+        const searchInput = document.getElementById('search-input');
+        if (searchInput) {
+            searchInput.addEventListener('input', e => {
+                this.currentSearch = e.target.value;
+                this.renderTable();
+            });
+        }
 
-    document.getElementById('item-form').addEventListener('input', () => this.validateForm());
+        const statusFilter = document.getElementById('status-filter');
+        if (statusFilter) {
+            statusFilter.addEventListener('change', e => {
+                this.currentFilter = e.target.value;
+                this.renderTable();
+            });
+        }
 
-    document.getElementById('item-modal').addEventListener('click', e => {
-        if (e.target.id === 'item-modal') this.closeModal();
-    });
+        const itemForm = document.getElementById('item-form');
+        if (itemForm) {
+            itemForm.addEventListener('input', () => this.validateForm());
+        }
 
-    document.getElementById('material-name').addEventListener('input', e => {
-        const matId = document.getElementById('material-id');
-        if (!matId.value && e.target.value) matId.value = `MAT-2024-${Date.now().toString().slice(-6)}`;
-    });
-}
-
-
-    openModal(itemId = null) {
-    this.editingItemId = itemId;
-    const modal = document.getElementById('item-modal');
-    const modalTitle = document.getElementById('modal-title');
-    const modalDescription = document.getElementById('modal-description');
-
-    if (itemId) {
-        modalTitle.textContent = 'Editar Item';
-        modalDescription.textContent = 'Edite as informações do item selecionado.';
-        this.loadItemData(itemId);
-    } else {
-        modalTitle.textContent = 'Anotar Novo Registro';
-        modalDescription.textContent = 'Adicione um novo registro ao estoque preenchendo as informações abaixo.';
-        this.clearForm();
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('verification-date').value = today;
+        const modal = document.getElementById('item-modal');
+        if (modal) {
+            modal.addEventListener('click', e => {
+                if (e.target.id === 'item-modal') this.closeModal();
+            });
+        }
     }
 
-    modal.classList.add('active'); // 🚀 Corrigido aqui
-    this.validateForm();
-}
+    openModal(itemId = null) {
+        this.editingItemId = itemId;
+        const modal = document.getElementById('item-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalDescription = document.getElementById('modal-description');
 
+        if (itemId) {
+            modalTitle.textContent = 'Editar Item';
+            modalDescription.textContent = 'Edite as informações do item selecionado.';
+            this.loadItemData(itemId);
+        } else {
+            modalTitle.textContent = 'Anotar Novo Registro';
+            modalDescription.textContent = 'Adicione um novo registro ao estoque preenchendo as informações abaixo.';
+            this.clearForm();
+            document.getElementById('verification-date').value = new Date().toISOString().split('T')[0];
+        }
+
+        modal.classList.add('active');
+    }
 
     closeModal() {
         document.getElementById('item-modal').classList.remove('active');
@@ -177,13 +195,13 @@ class StockManager {
         if (!item) return;
         document.getElementById('material-name').value = item.name;
         document.getElementById('material-id').value = item.materialId;
-        document.getElementById('material-desc').value = item.desc;
+        document.getElementById('material-desc').value = item.desc || '';
         document.getElementById('quantity').value = item.quantity;
         document.getElementById('status').value = item.status;
         document.getElementById('location').value = item.location;
-        document.getElementById('discard-reason').value = item.discardReason;
-        document.getElementById('verification-date').value = item.verificationDate;
-        document.getElementById('expiry-date').value = item.expiryDate;
+        document.getElementById('discard-reason').value = item.discardReason || '';
+        document.getElementById('verification-date').value = item.verificationDate || '';
+        document.getElementById('expiry-date').value = item.expiryDate || '';
         document.getElementById('responsible').value = item.responsible;
     }
 
@@ -194,7 +212,8 @@ class StockManager {
 
     validateForm() {
         const required = ['material-name','material-id','quantity','status','location','verification-date','responsible'];
-        document.getElementById('save-item-btn').disabled = !required.every(id => document.getElementById(id).value.trim() !== '');
+        const isValid = required.every(id => document.getElementById(id).value.trim() !== '');
+        document.getElementById('save-item-btn').disabled = !isValid;
     }
 
     async saveItem() {
@@ -219,48 +238,6 @@ class StockManager {
         }
         localStorage.setItem('stockItems', JSON.stringify(this.stockItems));
         this.renderTable();
-
-        // Salvar no Supabase
-        const { data, error } = await supabase
-            .from("registros")
-            .insert([{
-                name: formData.name,
-                material_id: formData.materialId,
-                descricao: formData.desc,
-                quantidade: formData.quantity,
-                status: formData.status,
-                localizacao: formData.location,
-                motivo_descartado: formData.discardReason,
-                data_verificacao: formData.verificationDate,
-                data_validade: formData.expiryDate,
-                responsavel: formData.responsible
-            }]);
-        if (error) console.error("Erro ao salvar no Supabase:", error);
-
-        // Enviar para Google Sheets
-        try {
-            const response = await fetch("SUA_URL_DO_APPS_SCRIPT", {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    PN: formData.materialId,
-                    ECODE: formData.materialId,
-                    DESCRIÇÃO: formData.desc,
-                    "LOCALIZAÇÃO NO ESTOQUE": formData.location,
-                    "MOTIVO DE DESCARTE": formData.discardReason,
-                    "DATA DE VERIFICAÇÃO": formData.verificationDate,
-                    "DATA DE VALIDADE": formData.expiryDate,
-                    RESPONSÁVEL: formData.responsible,
-                    QUANTIDADE: formData.quantity,
-                    STATUS: formData.status
-                })
-            });
-            const result = await response.json();
-            if (result.status !== "OK") console.error('Erro no Google Sheets:', result);
-        } catch (err) {
-            console.error('Erro conexão Apps Script:', err);
-        }
-
         this.closeModal();
     }
 
@@ -269,6 +246,7 @@ class StockManager {
         this.stockItems = this.stockItems.filter(i => i.id !== itemId);
         localStorage.setItem('stockItems', JSON.stringify(this.stockItems));
         this.renderTable();
+        this.updateItemsCount();
     }
 
     getFilteredItems() {
@@ -286,61 +264,68 @@ class StockManager {
         const noItemsMsg = document.getElementById('no-items-message');
         const filtered = this.getFilteredItems();
 
-        tbody.innerHTML = '';
         if (!filtered.length) {
+            tbody.innerHTML = '';
             noItemsMsg.style.display = 'block';
-        } else {
-            noItemsMsg.style.display = 'none';
-            filtered.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.name}</td>
-                    <td>${item.materialId}</td>
-                    <td>${item.quantity}</td>
-                    <td>${item.responsible}</td>
-                    <td><span class="status-badge ${this.getStatusClass(item.status)}">${item.status}</span></td>
-                    <td>${item.discardReason}</td>
-                    <td>
-                        <a href="#" class="action-link action-edit" data-id="${item.id}">Editar</a>
-                        <a href="#" class="action-link action-delete" data-id="${item.id}">Excluir</a>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
+            document.getElementById('items-count').textContent = `Exibindo 0 de ${this.stockItems.length} itens`;
+            return;
         }
-        this.updateItemsCount();
 
-        tbody.querySelectorAll('.action-edit').forEach(link => {
+        noItemsMsg.style.display = 'none';
+        tbody.innerHTML = '';
+
+        filtered.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.name ?? '-'}</td>
+                <td>${item.materialId ?? '-'}</td>
+                <td>${item.quantity ?? '-'}</td>
+                <td>${item.responsible ?? '-'}</td>
+                <td><span class="status-badge ${this.getStatusClass(item.status)}">${item.status ?? '-'}</span></td>
+                <td>${item.discardReason ?? '-'}</td>
+                <td>
+                    <a href="#" class="action-link action-edit" data-id="${item.id}">Editar</a>
+                    <a href="#" class="action-link action-delete" data-id="${item.id}">Excluir</a>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        tbody.querySelectorAll('.action-edit').forEach(link =>
             link.addEventListener('click', e => {
                 e.preventDefault();
                 this.openModal(e.currentTarget.dataset.id);
-            });
-        });
-        tbody.querySelectorAll('.action-delete').forEach(link => {
+            })
+        );
+
+        tbody.querySelectorAll('.action-delete').forEach(link =>
             link.addEventListener('click', e => {
                 e.preventDefault();
                 this.deleteItem(e.currentTarget.dataset.id);
-            });
-        });
+            })
+        );
+
+        this.updateItemsCount();
     }
 
     getStatusClass(status) {
         const classes = {
             'OK': 'status-ok',
-            'ALERT': 'status-alert',
-            'EXPIRED': 'status-expired'
+            'EM FALTA': 'status-falta',
+            'VENCIDO': 'status-vencido',
+            'EM DESCARTE': 'status-descarte'
         };
         return classes[status] || '';
     }
 
     updateItemsCount() {
-        document.getElementById('items-count').textContent = this.stockItems.length;
+        document.getElementById('items-count').textContent = `Exibindo ${this.getFilteredItems().length} de ${this.stockItems.length} itens`;
     }
 }
 
-// === Inicializar ===
+// === Inicialização ===
 document.addEventListener('DOMContentLoaded', () => {
     carregarMateriais();
     sincronizarSelects();
-    const manager = new StockManager();
+    window.stockManager = new StockManager();
 });
