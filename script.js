@@ -111,60 +111,60 @@ class StockManager {
         document.getElementById('verification-date').value = new Date().toISOString().split('T')[0];
     }
 
-    bindEvents() {
-        document.getElementById('add-item-btn').addEventListener('click', () => this.openModal());
-        document.getElementById('close-modal-btn').addEventListener('click', () => this.closeModal());
-        document.getElementById('cancel-modal-btn').addEventListener('click', () => this.closeModal());
-        document.getElementById('save-item-btn').addEventListener('click', () => this.saveItem());
-        document.getElementById('clear-form-btn').addEventListener('click', () => this.clearForm());
+   bindEvents() {
+    document.getElementById('add-item-btn').addEventListener('click', () => {
+        this.openModal();
+    });
+    document.getElementById('close-modal-btn').addEventListener('click', () => this.closeModal());
+    document.getElementById('cancel-modal-btn').addEventListener('click', () => this.closeModal());
+    document.getElementById('save-item-btn').addEventListener('click', () => this.saveItem());
+    document.getElementById('clear-form-btn').addEventListener('click', () => this.clearForm());
 
-        document.getElementById('search-input').addEventListener('input', e => {
-            this.currentSearch = e.target.value;
-            this.renderTable();
-        });
+    document.getElementById('search-input').addEventListener('input', e => {
+        this.currentSearch = e.target.value;
+        this.renderTable();
+    });
 
-        document.getElementById('status-filter').addEventListener('change', e => {
-            this.currentFilter = e.target.value;
-            this.renderTable();
-        });
+    document.getElementById('status-filter').addEventListener('change', e => {
+        this.currentFilter = e.target.value;
+        this.renderTable();
+    });
 
-        document.getElementById('item-form').addEventListener('input', () => this.validateForm());
+    document.getElementById('item-form').addEventListener('input', () => this.validateForm());
 
-        document.getElementById('item-modal').addEventListener('click', e => {
-            if (e.target.id === 'item-modal') this.closeModal();
-        });
+    document.getElementById('item-modal').addEventListener('click', e => {
+        if (e.target.id === 'item-modal') this.closeModal();
+    });
 
-        document.getElementById('material-name').addEventListener('input', e => {
-            const matId = document.getElementById('material-id');
-            const match = materiaisDB.find(m => m.name === e.target.value);
-            if (match) {
-                matId.value = match.code;
-                document.getElementById('material-desc').value = match.desc;
-            } else if (!matId.value) {
-                matId.value = `MAT-2024-${Date.now().toString().slice(-6)}`;
-            }
-        });
-    }
+    document.getElementById('material-name').addEventListener('input', e => {
+        const matId = document.getElementById('material-id');
+        if (!matId.value && e.target.value) matId.value = `MAT-2024-${Date.now().toString().slice(-6)}`;
+    });
+}
+
 
     openModal(itemId = null) {
-        this.editingItemId = itemId;
-        const modal = document.getElementById('item-modal');
-        const modalTitle = document.getElementById('modal-title');
-        const modalDescription = document.getElementById('modal-description');
+    this.editingItemId = itemId;
+    const modal = document.getElementById('item-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDescription = document.getElementById('modal-description');
 
-        if (itemId) {
-            modalTitle.textContent = 'Editar Item';
-            modalDescription.textContent = 'Edite as informações do item selecionado.';
-            this.loadItemData(itemId);
-        } else {
-            modalTitle.textContent = 'Anotar Novo Registro';
-            modalDescription.textContent = 'Adicione um novo registro ao estoque preenchendo as informações abaixo.';
-            this.clearForm();
-        }
-
-        modal.classList.add('active');
-        this.validateForm();
+    if (itemId) {
+        modalTitle.textContent = 'Editar Item';
+        modalDescription.textContent = 'Edite as informações do item selecionado.';
+        this.loadItemData(itemId);
+    } else {
+        modalTitle.textContent = 'Anotar Novo Registro';
+        modalDescription.textContent = 'Adicione um novo registro ao estoque preenchendo as informações abaixo.';
+        this.clearForm();
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('verification-date').value = today;
     }
+
+    modal.classList.add('active'); // 🚀 Corrigido aqui
+    this.validateForm();
+}
+
 
     closeModal() {
         document.getElementById('item-modal').classList.remove('active');
