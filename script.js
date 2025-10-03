@@ -43,6 +43,14 @@ const materiaisDB = [
     { name: "S1006-KIT-A", code: "5263329", desc: "ADESIVO, EPOXI, CABLAGENS ELETRICAS" }
 ];
 
+// === SUPABASE CONFIG ===
+import { createClient } from "https://esm.sh/@supabase/supabase-js";
+
+const SUPABASE_URL = "https://mqjhjcdfgksdfxfzfdlk.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xamhqY2RmZ2tzZGZ4ZnpmZGxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDQ0MjAsImV4cCI6MjA3NDk4MDQyMH0.Kbw_ai5CndZvJQ8SJEeVjPHIDsp-6flf941kIJpG6XY";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 // === Função para carregar selects ===
 function carregarMateriais() {
     const nameSelect = document.getElementById('material-name');
@@ -97,18 +105,19 @@ function sincronizarSelects() {
     });
 }
 
-// === Classe StockManager com cores restauradas ===
+// === Classe StockManager ===
 class StockManager {
     constructor() {
-        this.stockItems = JSON.parse(localStorage.getItem('stockItems')) || [];
+        this.stockItems = [];
         this.currentFilter = 'ALL';
         this.currentSearch = '';
         this.editingItemId = null;
         this.init();
     }
 
-    init() {
+    async init() {
         this.bindEvents();
+        await this.loadFromSupabase();
         this.renderTable();
         this.updateItemsCount();
         const today = new Date().toISOString().split('T')[0];
@@ -144,34 +153,61 @@ class StockManager {
         });
     }
 
-    openModal(itemId = null) {
-        this.editingItemId = itemId;
-        const modal = document.getElementById('item-modal');
-        const modalTitle = document.getElementById('modal-title');
-        const modalDescription = document.getElementById('modal-description');
-
-        if (itemId) {
-            modalTitle.textContent = 'Editar Item';
-            modalDescription.textContent = 'Edite as informações do item selecionado.';
-            this.loadItemData(itemId);
+    async loadFromSupabase() {
+        const { data, error } = await supabase.from("stock_items").select("*");
+        if (error) {
+            console.error("Erro ao carregar do Supabase:", error);
         } else {
-            modalTitle.textContent = 'Anotar Novo Registro';
-            modalDescription.textContent = 'Adicione um novo registro ao estoque preenchendo as informações abaixo.';
-            this.clearForm();
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('verification-date').value = today;
+            this.stockItems = data;
+        }
+    }
+
+    async saveItem() {
+        const formData = {
+            name: document.getElementById('material-name').value || "-",
+            materialId: document.getElementById('material-id').value || "-",
+            desc: document.getElementById('material-desc').value || "-",
+            quantity: parseInt(document.getElementById('quantity').value) || 0,
+            status: document.getElementById('status').value || "-",
+            location: document.getElementById('location').value || "-",
+            discardReason: document.getElementById('discard-reason').value || "-",
+            verificationDate: document.getElementById('verification-date').value || "-",
+            expiryDate: document.getElementById('expiry-date').value || "-",
+            responsible: document.getElementById('responsible').value || "-",
+            verifiedBy: document.getElementById('responsible').value || "-",
+            verifiedDate: new Date(document.getElementById('verification-date').value).toLocaleDateString('pt-BR')
+        };
+
+        let result;
+        if (this.editingItemId) {
+            result = await supabase.from("stock_items").update(formData).eq("id", this.editingItemId);
+        } else {
+            result = await supabase.from("stock_items").insert([formData]);
         }
 
-        modal.classList.add('active');
-        this.validateForm();
+        if (result.error) {
+            console.error("Erro ao salvar no Supabase:", result.error);
+        } else {
+            await this.loadFromSupabase();
+            this.renderTable();
+            this.updateItemsCount();
+            this.closeModal();
+        }
     }
 
-    closeModal() {
-        document.getElementById('item-modal').classList.remove('active');
-        this.editingItemId = null;
-        this.clearForm();
+    async deleteItem(itemId) {
+        if (!confirm('Deseja realmente remover este item?')) return;
+        const { error } = await supabase.from("stock_items").delete().eq("id", itemId);
+        if (error) {
+            console.error("Erro ao excluir:", error);
+        } else {
+            await this.loadFromSupabase();
+            this.renderTable();
+            this.updateItemsCount();
+        }
     }
 
+    // restante igual seu código
     loadItemData(itemId) {
         const item = this.stockItems.find(i => i.id === itemId);
         if (!item) return;
@@ -196,76 +232,6 @@ class StockManager {
         const required = ['material-name','material-id','quantity','status','location','verification-date','responsible'];
         const isValid = required.every(id => document.getElementById(id).value.trim() !== '');
         document.getElementById('save-item-btn').disabled = !isValid;
-    }
-
-    async saveItem() {
-        const formData = {
-            name: document.getElementById('material-name').value || "-",
-            materialId: document.getElementById('material-id').value || "-",
-            desc: document.getElementById('material-desc').value || "-",
-            quantity: parseInt(document.getElementById('quantity').value) || 0,
-            status: document.getElementById('status').value || "-",
-            location: document.getElementById('location').value || "-",
-            discardReason: document.getElementById('discard-reason').value || "-",
-            verificationDate: document.getElementById('verification-date').value || "-",
-            expiryDate: document.getElementById('expiry-date').value || "-",
-            responsible: document.getElementById('responsible').value || "-"
-        };
-
-        if (this.editingItemId) {
-            const idx = this.stockItems.findIndex(i => i.id === this.editingItemId);
-            if (idx !== -1) {
-                this.stockItems[idx] = {
-                    ...this.stockItems[idx],
-                    ...formData,
-                    verifiedBy: formData.responsible,
-                    verifiedDate: new Date(formData.verificationDate).toLocaleDateString('pt-BR')
-                };
-            }
-        } else {
-            this.stockItems.push({
-                id: Date.now().toString(),
-                ...formData,
-                verifiedBy: formData.responsible,
-                verifiedDate: new Date(formData.verificationDate).toLocaleDateString('pt-BR')
-            });
-        }
-
-        localStorage.setItem('stockItems', JSON.stringify(this.stockItems));
-        this.renderTable();
-        this.updateItemsCount();
-        this.closeModal();
-
-        try {
-            const response = await fetch("SUA_URL_DO_APPS_SCRIPT", {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    PN: formData.materialId,
-                    ECODE: formData.materialId,
-                    DESCRIÇÃO: formData.desc,
-                    "LOCALIZAÇÃO NO ESTOQUE": formData.location,
-                    "MOTIVO DE DESCARTE": formData.discardReason,
-                    "DATA DE VERIFICAÇÃO": formData.verificationDate,
-                    "DATA DE VALIDADE": formData.expiryDate,
-                    RESPONSÁVEL: formData.responsible,
-                    QUANTIDADE: formData.quantity,
-                    STATUS: formData.status
-                })
-            });
-            const result = await response.json();
-            if (result.status !== "OK") console.error('Erro ao enviar para o Google Sheets:', result);
-        } catch (err) {
-            console.error('Erro de conexão com o Apps Script:', err);
-        }
-    }
-
-    deleteItem(itemId) {
-        if (!confirm('Deseja realmente remover este item?')) return;
-        this.stockItems = this.stockItems.filter(i => i.id !== itemId);
-        localStorage.setItem('stockItems', JSON.stringify(this.stockItems));
-        this.renderTable();
-        this.updateItemsCount();
     }
 
     getFilteredItems() {
@@ -344,13 +310,38 @@ class StockManager {
     }
 
     updateItemsCount() {
-        document.getElementById('items-count').textContent = `Exibindo ${this.getFilteredItems().length} de ${this.stockItems.length} itens`;
+        document.getElementById('items-count').textContent = `Exibindo ${this.getFilteredItems().length} de ${this.stockItems
+
+
+
+.length} itens`;
+}
+
+
+openModal(itemId = null) {
+    this.editingItemId = itemId;
+    if (itemId) {
+        this.loadItemData(itemId);
+        document.getElementById('modal-title').textContent = 'Editar Registro';
+    } else {
+        this.clearForm();
+        document.getElementById('modal-title').textContent = 'Anotar Registro';
     }
+    document.getElementById('item-modal').style.display = 'block';
+    this.validateForm();
+}
+
+closeModal() {
+    document.getElementById('item-modal').style.display = 'none';
+    this.editingItemId = null;
+}
+
+
 }
 
 // === Inicialização ===
 document.addEventListener('DOMContentLoaded', () => {
-    carregarMateriais();
-    sincronizarSelects();
-    window.stockManager = new StockManager();
+carregarMateriais();
+sincronizarSelects();
+new StockManager();
 });
