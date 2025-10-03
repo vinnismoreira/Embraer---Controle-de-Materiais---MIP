@@ -51,59 +51,7 @@ const materiaisDB = [
     { name: "S1006-KIT-A", code: "5263329", desc: "ADESIVO, EPOXI, CABLAGENS ELETRICAS" }
 ];
 
-// === Funções auxiliares Supabase ===
-async function carregarTabelaSupabase() {
-    const { data, error } = await supabase
-        .from("registros")
-        .select("*")
-        .order("criado_em", { ascending: false });
-
-    if (error) {
-        console.error("Erro ao carregar tabela:", error);
-        return [];
-    }
-    return data;
-}
-
-async function salvarNoSupabase(dados) {
-    const { data, error } = await supabase
-        .from("registros")
-        .insert([dados]);
-
-    if (error) {
-        console.error("Erro ao salvar:", error);
-        return false;
-    }
-    return true;
-}
-
-async function atualizarNoSupabase(id, dados) {
-    const { error } = await supabase
-        .from("registros")
-        .update(dados)
-        .eq("id", id);
-
-    if (error) {
-        console.error("Erro ao atualizar:", error);
-        return false;
-    }
-    return true;
-}
-
-async function deletarNoSupabase(id) {
-    const { error } = await supabase
-        .from("registros")
-        .delete()
-        .eq("id", id);
-
-    if (error) {
-        console.error("Erro ao deletar:", error);
-        return false;
-    }
-    return true;
-}
-
-// === Funções de carregamento e sincronização dos selects ===
+// === Função para carregar selects ===
 function carregarMateriais() {
     const nameSelect = document.getElementById('material-name');
     const codeSelect = document.getElementById('material-id');
@@ -131,6 +79,7 @@ function carregarMateriais() {
     });
 }
 
+// === Sincronização entre selects ===
 function sincronizarSelects() {
     document.getElementById('material-name').addEventListener('change', () => {
         const match = materiaisDB.find(m => m.name === document.getElementById('material-name').value);
@@ -139,7 +88,6 @@ function sincronizarSelects() {
             document.getElementById('material-desc').value = match.desc;
         }
     });
-
     document.getElementById('material-id').addEventListener('change', () => {
         const match = materiaisDB.find(m => m.code === document.getElementById('material-id').value);
         if (match) {
@@ -147,7 +95,6 @@ function sincronizarSelects() {
             document.getElementById('material-desc').value = match.desc;
         }
     });
-
     document.getElementById('material-desc').addEventListener('change', () => {
         const value = document.getElementById('material-desc').value.trim().toLowerCase();
         const match = materiaisDB.find(m => m.desc.toLowerCase() === value);
@@ -158,21 +105,36 @@ function sincronizarSelects() {
     });
 }
 
-// === StockManager com integração Supabase ===
+// === Função para salvar dados no Supabase ===
+async function salvarNoSupabase(dados) {
+    const { data, error } = await supabase
+        .from("registros")
+        .insert([dados]);
+
+    if (error) {
+        console.error("Erro ao salvar:", error);
+        alert("❌ Erro ao salvar dados");
+        return false;
+    }
+    return true;
+}
+
+// === Classe StockManager ===
 class StockManager {
     constructor() {
-        this.stockItems = [];
+        this.stockItems = JSON.parse(localStorage.getItem('stockItems')) || [];
         this.currentFilter = 'ALL';
         this.currentSearch = '';
         this.editingItemId = null;
         this.init();
     }
 
-    async init() {
-        carregarMateriais();
-        sincronizarSelects();
-        await this.loadFromSupabase();
+    init() {
         this.bindEvents();
+        this.renderTable();
+        this.updateItemsCount();
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('verification-date').value = today;
     }
 
     bindEvents() {
@@ -192,66 +154,23 @@ class StockManager {
             this.renderTable();
         });
 
-        document.getElementById('item-form').addEventListener('input', () => this.validateForm());
         document.getElementById('item-modal').addEventListener('click', e => {
             if (e.target.id === 'item-modal') this.closeModal();
         });
     }
 
-    async loadFromSupabase() {
-        const dados = await carregarTabelaSupabase();
-        this.stockItems = dados.map(item => ({
-            id: item.id.toString(),
-            name: item.material ?? "-",
-            materialId: item.material_id ?? "-",
-            desc: item.descricao ?? "-",
-            quantity: item.quantidade ?? 0,
-            status: item.status ?? "-",
-            location: item.localizacao ?? "-",
-            discardReason: item.motivo_descartado ?? "-",
-            verificationDate: item.data_verificacao ?? "-",
-            expiryDate: item.data_validade ?? "-",
-            responsible: item.responsavel ?? "-"
-        }));
-        this.renderTable();
-    }
-
     openModal(itemId = null) {
         this.editingItemId = itemId;
         document.getElementById('item-modal').classList.add('active');
-        if (itemId) this.loadItemData(itemId);
-        else this.clearForm();
     }
 
     closeModal() {
         document.getElementById('item-modal').classList.remove('active');
-        this.editingItemId = null;
         this.clearForm();
-    }
-
-    loadItemData(itemId) {
-        const item = this.stockItems.find(i => i.id === itemId);
-        if (!item) return;
-        document.getElementById('material-name').value = item.name;
-        document.getElementById('material-id').value = item.materialId;
-        document.getElementById('material-desc').value = item.desc || '';
-        document.getElementById('quantity').value = item.quantity;
-        document.getElementById('status').value = item.status;
-        document.getElementById('location').value = item.location;
-        document.getElementById('discard-reason').value = item.discardReason || '';
-        document.getElementById('verification-date').value = item.verificationDate || '';
-        document.getElementById('expiry-date').value = item.expiryDate || '';
-        document.getElementById('responsible').value = item.responsible;
     }
 
     clearForm() {
         document.getElementById('item-form').reset();
-    }
-
-    validateForm() {
-        const required = ['material-name','material-id','quantity','status','location','verification-date','responsible'];
-        const isValid = required.every(id => document.getElementById(id).value.trim() !== '');
-        document.getElementById('save-item-btn').disabled = !isValid;
     }
 
     async saveItem() {
@@ -268,20 +187,20 @@ class StockManager {
             responsavel: document.getElementById('responsible').value || "-"
         };
 
+        // Salvar localmente
         if (this.editingItemId) {
-            await atualizarNoSupabase(this.editingItemId, formData);
+            const idx = this.stockItems.findIndex(i => i.id === this.editingItemId);
+            if (idx !== -1) this.stockItems[idx] = { id: this.editingItemId, ...formData };
         } else {
-            await salvarNoSupabase(formData);
+            this.stockItems.push({ id: Date.now().toString(), ...formData });
         }
+        localStorage.setItem('stockItems', JSON.stringify(this.stockItems));
+        this.renderTable();
 
-        await this.loadFromSupabase();
+        // Salvar no Supabase
+        await salvarNoSupabase(formData);
+
         this.closeModal();
-    }
-
-    async deleteItem(itemId) {
-        if (!confirm('Deseja realmente remover este item?')) return;
-        await deletarNoSupabase(itemId);
-        await this.loadFromSupabase();
     }
 
     getFilteredItems() {
@@ -289,60 +208,41 @@ class StockManager {
         if (this.currentFilter !== 'ALL') filtered = filtered.filter(i => i.status === this.currentFilter);
         if (this.currentSearch) {
             const term = this.currentSearch.toLowerCase();
-            filtered = filtered.filter(i => i.name.toLowerCase().includes(term) || i.materialId.toLowerCase().includes(term));
+            filtered = filtered.filter(i => i.material.toLowerCase().includes(term) || i.material_id.toLowerCase().includes(term));
         }
         return filtered;
     }
 
     renderTable() {
         const tbody = document.getElementById('stock-table-body');
-        tbody.innerHTML = '';
+        tbody.innerHTML = "";
         const filtered = this.getFilteredItems();
-
         filtered.forEach(item => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${item.name ?? '-'}</td>
-                <td>${item.materialId ?? '-'}</td>
-                <td>${item.quantity ?? '-'}</td>
-                <td>${item.responsible ?? '-'}</td>
-                <td><span class="status-badge ${this.getStatusClass(item.status)}">${item.status ?? '-'}</span></td>
-                <td>${item.discardReason ?? '-'}</td>
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${item.material}</td>
+                <td>${item.material_id}</td>
+                <td>${item.quantidade}</td>
+                <td>${item.responsavel}</td>
+                <td>${item.status}</td>
+                <td>${item.motivo_descartado}</td>
                 <td>
-                    <a href="#" class="action-link action-edit" data-id="${item.id}">Editar</a>
-                    <a href="#" class="action-link action-delete" data-id="${item.id}">Excluir</a>
+                    <a href="#" class="action-edit" data-id="${item.id}">Editar</a>
+                    <a href="#" class="action-delete" data-id="${item.id}">Excluir</a>
                 </td>
             `;
-            tbody.appendChild(row);
+            tbody.appendChild(tr);
         });
-
-        tbody.querySelectorAll('.action-edit').forEach(link =>
-            link.addEventListener('click', e => {
-                e.preventDefault();
-                this.openModal(e.currentTarget.dataset.id);
-            })
-        );
-
-        tbody.querySelectorAll('.action-delete').forEach(link =>
-            link.addEventListener('click', e => {
-                e.preventDefault();
-                this.deleteItem(e.currentTarget.dataset.id);
-            })
-        );
     }
 
-    getStatusClass(status) {
-        const classes = {
-            'OK': 'status-ok',
-            'EM FALTA': 'status-falta',
-            'VENCIDO': 'status-vencido',
-            'EM DESCARTE': 'status-descarte'
-        };
-        return classes[status] || '';
+    updateItemsCount() {
+        document.getElementById('items-count').textContent = `${this.getFilteredItems().length} itens`;
     }
 }
 
 // === Inicialização ===
 document.addEventListener('DOMContentLoaded', () => {
+    carregarMateriais();
+    sincronizarSelects();
     window.stockManager = new StockManager();
 });
