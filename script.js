@@ -115,7 +115,6 @@ class StockManager {
     };
 
 
-
         if (this.editingItemId) {
             const idx = this.stockItems.findIndex(i => i.id === this.editingItemId);
             if (idx !== -1) {
@@ -331,8 +330,11 @@ document.getElementById('material-id').addEventListener('change', () => {
     }
 });
 document.getElementById('material-desc').addEventListener('change', () => {
-    const match = materiaisDB.find(m => m.desc === document.getElementById('material-desc').value);
+    const value = document.getElementById('material-desc').value.trim().toLowerCase();
+    const match = materiaisDB.find(m => m.desc.toLowerCase() === value);
+
     if (match) { 
         document.getElementById('material-name').value = match.name; 
         document.getElementById('material-id').value = match.code; 
     }
+});
