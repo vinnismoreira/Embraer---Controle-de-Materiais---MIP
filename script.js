@@ -47,7 +47,8 @@ const materiaisDB = [
 import { createClient } from "https://esm.sh/@supabase/supabase-js";
 
 const SUPABASE_URL = "https://mqjhjcdfgksdfxfzfdlk.supabase.co";
-const SUPABASE_ANON_KEY = "SUA-ANON-KEY"; // substitua
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xamhqY2RmZ2tzZGZ4ZnpmZGxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDQ0MjAsImV4cCI6MjA3NDk4MDQyMH0.Kbw_ai5CndZvJQ8SJEeVjPHIDsp-6flf941kIJpG6XY";
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // === Função para carregar selects ===
@@ -158,14 +159,12 @@ class StockManager {
 
         document.getElementById('material-name').addEventListener('input', e => {
             const matId = document.getElementById('material-id');
-            if (!matId.value && e.target.value) {
-                matId.value = `MAT-2024-${Date.now().toString().slice(-6)}`;
-            }
+            if (!matId.value && e.target.value) matId.value = `MAT-2024-${Date.now().toString().slice(-6)}`;
         });
     }
 
     async loadFromSupabase() {
-        const { data, error } = await supabase.from("GESTAO_DE_ESTOQUE").select("*");
+        const { data, error } = await supabase.from("stock_items").select("*");
         if (error) {
             console.error("Erro ao carregar do Supabase:", error);
         } else {
@@ -175,26 +174,23 @@ class StockManager {
 
     async saveItem() {
         const formData = {
-            pn: document.getElementById('material-name').value || "-",
-            ecode: document.getElementById('material-id').value || "-",
-            descricao: document.getElementById('material-desc').value || "-",
-            quantidade: parseInt(document.getElementById('quantity').value) || 0,
+            name: document.getElementById('material-name').value || "-",
+            materialId: document.getElementById('material-id').value || "-",
+            desc: document.getElementById('material-desc').value || "-",
+            quantity: parseInt(document.getElementById('quantity').value) || 0,
             status: document.getElementById('status').value || "-",
-            localizacao_no_estoque: document.getElementById('location').value || "-",
-            motivo_de_descarte: document.getElementById('discard-reason').value || "-",
-            data_de_verificacao: document.getElementById('verification-date').value || null,
-            data_de_validade: document.getElementById('expiry-date').value || null,
-            responsavel_pelo_registro: document.getElementById('responsible').value || "-"
+            location: document.getElementById('location').value || "-",
+            discardReason: document.getElementById('discard-reason').value || "-",
+            verificationDate: document.getElementById('verification-date').value || "-",
+            expiryDate: document.getElementById('expiry-date').value || "-",
+            responsible: document.getElementById('responsible').value || "-"
         };
 
         let result;
         if (this.editingItemId) {
-            result = await supabase.from("GESTAO_DE_ESTOQUE")
-                .update(formData)
-                .eq("id", this.editingItemId);
+            result = await supabase.from("stock_items").update(formData).eq("id", this.editingItemId);
         } else {
-            result = await supabase.from("GESTAO_DE_ESTOQUE")
-                .insert([formData]);
+            result = await supabase.from("stock_items").insert([formData]);
         }
 
         if (result.error) {
@@ -209,9 +205,7 @@ class StockManager {
 
     async deleteItem(itemId) {
         if (!confirm('Deseja realmente remover este item?')) return;
-        const { error } = await supabase.from("GESTAO_DE_ESTOQUE")
-            .delete()
-            .eq("id", itemId);
+        const { error } = await supabase.from("stock_items").delete().eq("id", itemId);
         if (error) {
             console.error("Erro ao excluir:", error);
         } else {
@@ -224,16 +218,16 @@ class StockManager {
     loadItemData(itemId) {
         const item = this.stockItems.find(i => i.id == itemId);
         if (!item) return;
-        document.getElementById('material-name').value = item.pn;
-        document.getElementById('material-id').value = item.ecode;
-        document.getElementById('material-desc').value = item.descricao || '';
-        document.getElementById('quantity').value = item.quantidade;
+        document.getElementById('material-name').value = item.name;
+        document.getElementById('material-id').value = item.materialId;
+        document.getElementById('material-desc').value = item.desc || '';
+        document.getElementById('quantity').value = item.quantity;
         document.getElementById('status').value = item.status;
-        document.getElementById('location').value = item.localizacao_no_estoque;
-        document.getElementById('discard-reason').value = item.motivo_de_descarte || '';
-        document.getElementById('verification-date').value = item.data_de_verificacao || '';
-        document.getElementById('expiry-date').value = item.data_de_validade || '';
-        document.getElementById('responsible').value = item.responsavel_pelo_registro;
+        document.getElementById('location').value = item.location;
+        document.getElementById('discard-reason').value = item.discardReason || '';
+        document.getElementById('verification-date').value = item.verificationDate || '';
+        document.getElementById('expiry-date').value = item.expiryDate || '';
+        document.getElementById('responsible').value = item.responsible;
     }
 
     clearForm() {
@@ -252,11 +246,7 @@ class StockManager {
         if (this.currentFilter !== 'ALL') filtered = filtered.filter(i => i.status === this.currentFilter);
         if (this.currentSearch) {
             const term = this.currentSearch.toLowerCase();
-            filtered = filtered.filter(i => 
-                i.pn.toLowerCase().includes(term) ||
-                i.ecode.toLowerCase().includes(term) ||
-                (i.descricao || '').toLowerCase().includes(term)
-            );
+            filtered = filtered.filter(i => i.name.toLowerCase().includes(term) || i.materialId.toLowerCase().includes(term));
         }
         return filtered;
     }
@@ -279,16 +269,16 @@ class StockManager {
         filtered.forEach(item => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${item.pn ?? '-'}</td>
-                <td>${item.ecode ?? '-'}</td>
-                <td>${item.quantidade ?? '-'}</td>
-                <td>${item.responsavel_pelo_registro ?? '-'}</td>
+                <td>${item.name ?? '-'}</td>
+                <td>${item.materialId ?? '-'}</td>
+                <td>${item.quantity ?? '-'}</td>
+                <td>${item.responsible ?? '-'}</td>
                 <td>
                     <span class="status-badge ${this.getStatusClass(item.status)}">
                         ${item.status ?? '-'}
                     </span>
                 </td>
-                <td>${item.motivo_de_descarte ?? '-'}</td>
+                <td>${item.discardReason ?? '-'}</td>
                 <td>
                     <a href="#" class="action-link action-edit" data-id="${item.id}">Editar</a>
                     <a href="#" class="action-link action-delete" data-id="${item.id}">Excluir</a>
@@ -327,8 +317,7 @@ class StockManager {
     }
 
     updateItemsCount() {
-        document.getElementById('items-count').textContent =
-            `Exibindo ${this.getFilteredItems().length} de ${this.stockItems.length} itens`;
+        document.getElementById('items-count').textContent = `Exibindo ${this.getFilteredItems().length} de ${this.stockItems.length} itens`;
     }
 
     openModal(itemId = null) {
