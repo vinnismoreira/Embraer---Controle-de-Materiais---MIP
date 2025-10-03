@@ -171,44 +171,42 @@ class StockManager {
     }
 
     async saveItem() {
-    const formData = {
-        name: document.getElementById('material-name').value || "-",
-        materialId: document.getElementById('material-id').value || "-",
-        desc: document.getElementById('material-desc').value || "-",
-        quantity: parseInt(document.getElementById('quantity').value) || 0,
-        status: document.getElementById('status').value || "-",
-        location: document.getElementById('location').value || "-",
-        discardReason: document.getElementById('discard-reason').value || "-",
-        verificationDate: document.getElementById('verification-date').value || "-",
-        expiryDate: document.getElementById('expiry-date').value || "-",
-        responsible: document.getElementById('responsible').value || "-",
-        verifiedBy: document.getElementById('responsible').value || "-",
-        verifiedDate: new Date(document.getElementById('verification-date').value).toLocaleDateString('pt-BR')
-    };
+        const formData = {
+            name: document.getElementById('material-name').value || "-",
+            materialId: document.getElementById('material-id').value || "-",
+            desc: document.getElementById('material-desc').value || "-",
+            quantity: parseInt(document.getElementById('quantity').value) || 0,
+            status: document.getElementById('status').value || "-",
+            location: document.getElementById('location').value || "-",
+            discardReason: document.getElementById('discard-reason').value || "-",
+            verificationDate: document.getElementById('verification-date').value || "-",
+            expiryDate: document.getElementById('expiry-date').value || "-",
+            responsible: document.getElementById('responsible').value || "-",
+            verifiedBy: document.getElementById('responsible').value || "-",
+            verifiedDate: new Date(document.getElementById('verification-date').value).toLocaleDateString('pt-BR')
+        };
 
-    let result;
-    if (this.editingItemId) {
-        result = await supabase.from("stock_items").update(formData).eq("id", this.editingItemId);
-    } else {
-        result = await supabase.from("stock_items").insert([formData]);
+        let result;
+        if (this.editingItemId) {
+            result = await supabase.from("stock_items").update(formData).eq("id", this.editingItemId);
+        } else {
+            result = await supabase.from("stock_items").insert([formData]);
+        }
+
+        if (result.error) {
+            console.error("Erro ao salvar no Supabase:", result.error);
+        } else {
+            await this.loadFromSupabase();
+            this.renderTable();
+            this.updateItemsCount();
+            this.closeModal();
+        }
     }
-
-    if (result.error) {
-        console.error("❌ Erro ao salvar no Supabase:", result.error);
-        alert("Erro ao salvar no banco: " + result.error.message);
-        return;
-    }
-
-    await this.loadFromSupabase();
-    this.renderTable();
-    this.updateItemsCount();
-    this.closeModal();
-}
-
 
     async deleteItem(itemId) {
         if (!confirm('Deseja realmente remover este item?')) return;
-        const { error } = await supabase.from("stock_items").delete().eq("id", itemId);
+        const { error } = await supabase.from("GESTAO_DE_ESTOQUE")
+.delete().eq("id", itemId);
         if (error) {
             console.error("Erro ao excluir:", error);
         } else {
