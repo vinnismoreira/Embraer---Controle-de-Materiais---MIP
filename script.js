@@ -1,11 +1,3 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js";
-
-// ⚡ CONFIGURAÇÃO DO SUPABASE
-const supabase = createClient(
-  "https://SEU-PROJECT.supabase.co", // sua URL do Supabase
-  "SUA-ANON-KEY"                    // sua anon key
-);
-
 // === Banco de Materiais ===
 const materiaisDB = [
     { name: "SOLVE TS 500 LTT", code: "79868", desc: "SOLVENTE PARA LIMPEZA MANUAL DE PEÇ" },
@@ -243,8 +235,6 @@ class StockManager {
         this.renderTable();
         this.updateItemsCount();
         this.closeModal();
-
-        
 
         try {
             const response = await fetch("SUA_URL_DO_APPS_SCRIPT", {
