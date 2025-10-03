@@ -97,7 +97,7 @@ function sincronizarSelects() {
     });
 }
 
-// === Classe StockManager (seu código completo mantido) ===
+// === Classe StockManager com cores restauradas ===
 class StockManager {
     constructor() {
         this.stockItems = JSON.parse(localStorage.getItem('stockItems')) || [];
@@ -289,6 +289,7 @@ class StockManager {
             document.getElementById('items-count').textContent = `Exibindo 0 de ${this.stockItems.length} itens`;
             return;
         }
+
         noItemsMsg.style.display = 'none';
         tbody.innerHTML = '';
 
@@ -333,12 +334,13 @@ class StockManager {
     }
 
     getStatusClass(status) {
-        switch (status) {
-            case 'Bom': return 'status-good';
-            case 'Atenção': return 'status-warning';
-            case 'Crítico': return 'status-critical';
-            default: return '';
-        }
+        const classes = {
+            'OK': 'status-ok',
+            'EM FALTA': 'status-falta',
+            'VENCIDO': 'status-vencido',
+            'EM DESCARTE': 'status-descarte'
+        };
+        return classes[status] || '';
     }
 
     updateItemsCount() {
