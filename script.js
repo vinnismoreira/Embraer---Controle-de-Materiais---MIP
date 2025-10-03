@@ -2,8 +2,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js";
 
 // ⚡ CONFIGURAÇÃO DO SUPABASE
 const supabase = createClient(
-  "https://mqjhjcdfgksdfxfzfdlk.supabase.co", // sua URL do Supabase
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xamhqY2RmZ2tzZGZ4ZnpmZGxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDQ0MjAsImV4cCI6MjA3NDk4MDQyMH0.Kbw_ai5CndZvJQ8SJEeVjPHIDsp-6flf941kIJpG6XY"                    // sua anon key
+  "https://SEU-PROJECT.supabase.co", // sua URL do Supabase
+  "SUA-ANON-KEY"                    // sua anon key
 );
 
 // === Banco de Materiais ===
@@ -105,7 +105,7 @@ function sincronizarSelects() {
     });
 }
 
-// === Classe StockManager ===
+// === Classe StockManager com cores restauradas ===
 class StockManager {
     constructor() {
         this.stockItems = JSON.parse(localStorage.getItem('stockItems')) || [];
@@ -119,49 +119,37 @@ class StockManager {
         this.bindEvents();
         this.renderTable();
         this.updateItemsCount();
-        document.getElementById('verification-date').value = new Date().toISOString().split('T')[0];
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('verification-date').value = today;
     }
 
     bindEvents() {
-        const addBtn = document.getElementById('add-item-btn');
-        const closeBtn = document.getElementById('close-modal-btn');
-        const cancelBtn = document.getElementById('cancel-modal-btn');
-        const saveBtn = document.getElementById('save-item-btn');
-        const clearBtn = document.getElementById('clear-form-btn');
+        document.getElementById('add-item-btn').addEventListener('click', () => this.openModal());
+        document.getElementById('close-modal-btn').addEventListener('click', () => this.closeModal());
+        document.getElementById('cancel-modal-btn').addEventListener('click', () => this.closeModal());
+        document.getElementById('save-item-btn').addEventListener('click', () => this.saveItem());
+        document.getElementById('clear-form-btn').addEventListener('click', () => this.clearForm());
 
-        if (addBtn) addBtn.addEventListener('click', () => this.openModal());
-        if (closeBtn) closeBtn.addEventListener('click', () => this.closeModal());
-        if (cancelBtn) cancelBtn.addEventListener('click', () => this.closeModal());
-        if (saveBtn) saveBtn.addEventListener('click', () => this.saveItem());
-        if (clearBtn) clearBtn.addEventListener('click', () => this.clearForm());
+        document.getElementById('search-input').addEventListener('input', e => {
+            this.currentSearch = e.target.value;
+            this.renderTable();
+        });
 
-        const searchInput = document.getElementById('search-input');
-        if (searchInput) {
-            searchInput.addEventListener('input', e => {
-                this.currentSearch = e.target.value;
-                this.renderTable();
-            });
-        }
+        document.getElementById('status-filter').addEventListener('change', e => {
+            this.currentFilter = e.target.value;
+            this.renderTable();
+        });
 
-        const statusFilter = document.getElementById('status-filter');
-        if (statusFilter) {
-            statusFilter.addEventListener('change', e => {
-                this.currentFilter = e.target.value;
-                this.renderTable();
-            });
-        }
+        document.getElementById('item-form').addEventListener('input', () => this.validateForm());
 
-        const itemForm = document.getElementById('item-form');
-        if (itemForm) {
-            itemForm.addEventListener('input', () => this.validateForm());
-        }
+        document.getElementById('item-modal').addEventListener('click', e => {
+            if (e.target.id === 'item-modal') this.closeModal();
+        });
 
-        const modal = document.getElementById('item-modal');
-        if (modal) {
-            modal.addEventListener('click', e => {
-                if (e.target.id === 'item-modal') this.closeModal();
-            });
-        }
+        document.getElementById('material-name').addEventListener('input', e => {
+            const matId = document.getElementById('material-id');
+            if (!matId.value && e.target.value) matId.value = `MAT-2024-${Date.now().toString().slice(-6)}`;
+        });
     }
 
     openModal(itemId = null) {
@@ -178,10 +166,12 @@ class StockManager {
             modalTitle.textContent = 'Anotar Novo Registro';
             modalDescription.textContent = 'Adicione um novo registro ao estoque preenchendo as informações abaixo.';
             this.clearForm();
-            document.getElementById('verification-date').value = new Date().toISOString().split('T')[0];
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('verification-date').value = today;
         }
 
         modal.classList.add('active');
+        this.validateForm();
     }
 
     closeModal() {
@@ -232,13 +222,52 @@ class StockManager {
 
         if (this.editingItemId) {
             const idx = this.stockItems.findIndex(i => i.id === this.editingItemId);
-            if (idx !== -1) this.stockItems[idx] = { id: this.editingItemId, ...formData };
+            if (idx !== -1) {
+                this.stockItems[idx] = {
+                    ...this.stockItems[idx],
+                    ...formData,
+                    verifiedBy: formData.responsible,
+                    verifiedDate: new Date(formData.verificationDate).toLocaleDateString('pt-BR')
+                };
+            }
         } else {
-            this.stockItems.push({ id: Date.now().toString(), ...formData });
+            this.stockItems.push({
+                id: Date.now().toString(),
+                ...formData,
+                verifiedBy: formData.responsible,
+                verifiedDate: new Date(formData.verificationDate).toLocaleDateString('pt-BR')
+            });
         }
+
         localStorage.setItem('stockItems', JSON.stringify(this.stockItems));
         this.renderTable();
+        this.updateItemsCount();
         this.closeModal();
+
+        
+
+        try {
+            const response = await fetch("SUA_URL_DO_APPS_SCRIPT", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    PN: formData.materialId,
+                    ECODE: formData.materialId,
+                    DESCRIÇÃO: formData.desc,
+                    "LOCALIZAÇÃO NO ESTOQUE": formData.location,
+                    "MOTIVO DE DESCARTE": formData.discardReason,
+                    "DATA DE VERIFICAÇÃO": formData.verificationDate,
+                    "DATA DE VALIDADE": formData.expiryDate,
+                    RESPONSÁVEL: formData.responsible,
+                    QUANTIDADE: formData.quantity,
+                    STATUS: formData.status
+                })
+            });
+            const result = await response.json();
+            if (result.status !== "OK") console.error('Erro ao enviar para o Google Sheets:', result);
+        } catch (err) {
+            console.error('Erro de conexão com o Apps Script:', err);
+        }
     }
 
     deleteItem(itemId) {
@@ -281,7 +310,11 @@ class StockManager {
                 <td>${item.materialId ?? '-'}</td>
                 <td>${item.quantity ?? '-'}</td>
                 <td>${item.responsible ?? '-'}</td>
-                <td><span class="status-badge ${this.getStatusClass(item.status)}">${item.status ?? '-'}</span></td>
+                <td>
+                    <span class="status-badge ${this.getStatusClass(item.status)}">
+                        ${item.status ?? '-'}
+                    </span>
+                </td>
                 <td>${item.discardReason ?? '-'}</td>
                 <td>
                     <a href="#" class="action-link action-edit" data-id="${item.id}">Editar</a>
@@ -294,14 +327,16 @@ class StockManager {
         tbody.querySelectorAll('.action-edit').forEach(link =>
             link.addEventListener('click', e => {
                 e.preventDefault();
-                this.openModal(e.currentTarget.dataset.id);
+                const id = e.currentTarget.dataset.id;
+                this.openModal(id);
             })
         );
 
         tbody.querySelectorAll('.action-delete').forEach(link =>
             link.addEventListener('click', e => {
                 e.preventDefault();
-                this.deleteItem(e.currentTarget.dataset.id);
+                const id = e.currentTarget.dataset.id;
+                this.deleteItem(id);
             })
         );
 
