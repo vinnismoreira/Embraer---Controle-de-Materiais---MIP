@@ -128,16 +128,11 @@ class StockManager {
     document.getElementById('add-item-btn').addEventListener('click', () => this.openModal());
     document.getElementById('close-modal-btn').addEventListener('click', () => this.closeModal());
     document.getElementById('cancel-modal-btn').addEventListener('click', () => this.closeModal());
+    // ❌ Remova este: document.getElementById('save-item-btn').addEventListener('click', () => this.saveItem());
 
-    // ✅ Evento de submit do formulário
+    // ✅ Use o evento de submit do formulário
     document.getElementById('item-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        await this.saveItem();
-    });
-
-    // ✅ Garantia extra: caso o botão seja "button"
-    document.getElementById('save-item-btn').addEventListener('click', async (e) => {
-        e.preventDefault();
+        e.preventDefault(); // impede reload
         await this.saveItem();
     });
 
@@ -164,7 +159,6 @@ class StockManager {
         if (!matId.value && e.target.value) matId.value = `MAT-2024-${Date.now().toString().slice(-6)}`;
     });
 }
-
 
 
     async loadFromSupabase() {
