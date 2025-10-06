@@ -1,3 +1,10 @@
+// Importa o SDK do Supabase
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const SUPABASE_URL = "https://mqjhjcdfgksdfxfzfdlk.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xamhqY2RmZ2tzZGZ4ZnpmZGxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDQ0MjAsImV4cCI6MjA3NDk4MDQyMH0.Kbw_ai5CndZvJQ8SJEeVjPHIDsp-6flf941kIJpG6XY";
+
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 // Stock Management System
 class StockManager {
     constructor() {
@@ -303,3 +310,12 @@ document.getElementById('material-desc').addEventListener('change', () => {
         document.getElementById('material-id').value = match.code; 
     }
 });
+
+(async () => {
+  const { data, error } = await supabase.from("GESTAO_DE_ESTOQUE").select("*").limit(1);
+  if (error) {
+    console.error("❌ Erro ao conectar com Supabase:", error.message);
+  } else {
+    console.log("✅ Conectado ao Supabase com sucesso!");
+  }
+})();
