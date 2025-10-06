@@ -108,72 +108,60 @@ class StockManager {
     }
 
     async saveItem() {
-        const formData = {
-            name: document.getElementById('material-name').value,
-            materialId: document.getElementById('material-id').value,
-            desc: document.getElementById('material-desc').value,
-            quantity: parseInt(document.getElementById('quantity').value),
-            status: document.getElementById('status').value,
-            location: document.getElementById('location').value,
-            discardReason: document.getElementById('discard-reason').value,
-            verificationDate: document.getElementById('verification-date').value,
-            expiryDate: document.getElementById('expiry-date').value,
-            responsible: document.getElementById('responsible').value
-        };
+  const formData = {
+    pn: document.getElementById('material-name').value,
+    ecode: document.getElementById('material-id').value,
+    descricao: document.getElementById('material-desc').value,
+    quantidade: parseInt(document.getElementById('quantity').value),
+    status: document.getElementById('status').value,
+    localizacao_no_estoque: document.getElementById('location').value,
+    motivo_de_descarte: document.getElementById('discard-reason').value,
+    data_de_verificacao: document.getElementById('verification-date').value,
+    data_de_validade: document.getElementById('expiry-date').value,
+    responsavel_pelo_registro: document.getElementById('responsible').value,
+  };
 
-        if (this.editingItemId) {
-            const idx = this.stockItems.findIndex(i => i.id === this.editingItemId);
-            if (idx !== -1) {
-                this.stockItems[idx] = {
-                    ...this.stockItems[idx],
-                    ...formData,
-                    verifiedBy: formData.responsible,
-                    verifiedDate: new Date(formData.verificationDate).toLocaleDateString('pt-BR')
-                };
-            }
-        } else {
-            this.stockItems.push({
-                id: Date.now().toString(),
-                ...formData,
-                verifiedBy: formData.responsible,
-                verifiedDate: new Date(formData.verificationDate).toLocaleDateString('pt-BR')
-            });
-        }
+  try {
+    // Salva no Supabase
+    const { data, error } = await supabase
+      .from("GESTAO_DE_ESTOQUE")
+      .insert([formData]);
 
-        localStorage.setItem('stockItems', JSON.stringify(this.stockItems));
-        this.renderTable();
-        this.updateItemsCount();
-        this.closeModal();
-
-        // --- Envia para Google Sheets via Apps Script ---
-        try {
-            const response = await fetch("https://script.google.com/macros/s/AKfycbw_Pug1cE2-0W_E4pblwz3Zw-q2MNb9V4FZvJ1qZgg1pl8yJifBZlzxY1iL0xv5f-6i-w/exec", {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    PN: formData.materialId,
-                    ECODE: formData.materialId,
-                    DESCRIÇÃO: formData.desc,
-                    "LOCALIZAÇÃO NO ESTOQUE": formData.location,
-                    "MOTIVO DE DESCARTE": formData.discardReason,
-                    "DATA DE VERIFICAÇÃO": formData.verificationDate,
-                    "DATA DE VALIDADE": formData.expiryDate,
-                    RESPONSÁVEL: formData.responsible,
-                    QUANTIDADE: formData.quantity,
-                    STATUS: formData.status
-                })
-            });
-            const result = await response.json();
-            if (result.status !== "OK") console.error('Erro ao enviar para o Google Sheets:', result);
-        } catch (err) {
-            console.error('Erro de conexão com o Apps Script:', err);
-        }
+    if (error) {
+      console.error("❌ Erro ao salvar no Supabase:", error.message);
+      alert("Erro ao salvar no banco: " + error.message);
+      return;
     }
 
+    console.log("✅ Registro salvo no Supabase:", data);
+
+    // Atualiza também no localStorage (para exibir na tela)
+    this.stockItems.push({
+      id: Date.now().toString(),
+      ...formData,
+      verifiedBy: formData.responsible,
+      verifiedDate: new Date(formData.verificationDate).toLocaleDateString('pt-BR'),
+    });
+
+    localStorage.setItem('stockItems', JSON.stringify(this.stockItems));
+    this.renderTable();
+    this.updateItemsCount();
+    this.closeModal();
+
+    alert("✅ Registro salvo com sucesso!");
+
+  } catch (err) {
+    console.error("❌ Erro inesperado:", err);
+    alert("Erro inesperado ao salvar o item.");
+  }
+}
+
+            
     deleteItem(itemId) {
         if (!confirm('Deseja realmente remover este item?')) return;
         this.stockItems = this.stockItems.filter(i => i.id !== itemId);
         localStorage.setItem('stockItems', JSON.stringify(this.stockItems));
+        supabase.from("GESTAO_DE_ESTOQUE").delete().eq("id", itemId);
         this.renderTable();
         this.updateItemsCount();
     }
