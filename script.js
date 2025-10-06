@@ -193,21 +193,21 @@ class StockManager {
         filtered.forEach(item => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${item.name || '-'}</td>
-                <td>${item.materialId || '-'}</td>
-                <td>${item.quantity ?? '-'}</td>
-                <td>${item.responsible || item.verifiedBy || '-'}</td>
-                <td>
-                    <span class="status-badge ${this.getStatusClass(item.status)}">
-                        ${item.status || '-'}
-                    </span>
-                </td>
-                <td>${item.discardReason || '-'}</td>
-                <td>
-                    <a href="#" class="action-link action-edit" data-id="${item.id}">Editar</a>
-                    <a href="#" class="action-link action-delete" data-id="${item.id}">Excluir</a>
-                </td>
-            `;
+    <td>${item.pn || '-'}</td>
+    <td>${item.ecode || '-'}</td>
+    <td>${item.quantidade ?? '-'}</td>
+    <td>${item.responsavel_pelo_registro || '-'}</td>
+    <td>
+        <span class="status-badge ${this.getStatusClass(item.status)}">
+            ${item.status || '-'}
+        </span>
+    </td>
+    <td>${item.motivo_de_descarte || '-'}</td>
+    <td>
+        <a href="#" class="action-link action-edit" data-id="${item.id}">Editar</a>
+        <a href="#" class="action-link action-delete" data-id="${item.id}">Excluir</a>
+    </td>
+`;
             tbody.appendChild(row);
         });
     
