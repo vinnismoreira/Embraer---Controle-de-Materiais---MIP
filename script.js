@@ -1,4 +1,257 @@
-// === Banco de Materiais ===
+// Stock Management System
+class StockManager {
+    constructor() {
+        this.stockItems = JSON.parse(localStorage.getItem('stockItems')) || [];
+        this.currentFilter = 'ALL';
+        this.currentSearch = '';
+        this.editingItemId = null;
+        this.init();
+    }
+
+    init() {
+        this.bindEvents();
+        this.renderTable();
+        this.updateItemsCount();
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('verification-date').value = today;
+    }
+
+    bindEvents() {
+        document.getElementById('add-item-btn').addEventListener('click', () => this.openModal());
+        document.getElementById('close-modal-btn').addEventListener('click', () => this.closeModal());
+        document.getElementById('cancel-modal-btn').addEventListener('click', () => this.closeModal());
+        document.getElementById('save-item-btn').addEventListener('click', () => this.saveItem());
+        document.getElementById('clear-form-btn').addEventListener('click', () => this.clearForm());
+
+        document.getElementById('search-input').addEventListener('input', e => {
+            this.currentSearch = e.target.value;
+            this.renderTable();
+        });
+
+        document.getElementById('status-filter').addEventListener('change', e => {
+            this.currentFilter = e.target.value;
+            this.renderTable();
+        });
+
+        document.getElementById('item-form').addEventListener('input', () => this.validateForm());
+
+        document.getElementById('item-modal').addEventListener('click', e => {
+            if (e.target.id === 'item-modal') this.closeModal();
+        });
+
+        // Auto-generate material ID
+        document.getElementById('material-name').addEventListener('input', e => {
+            const matId = document.getElementById('material-id');
+            if (!matId.value && e.target.value) matId.value = `MAT-2024-${Date.now().toString().slice(-6)}`;
+        });
+    }
+
+    openModal(itemId = null) {
+        this.editingItemId = itemId;
+        const modal = document.getElementById('item-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalDescription = document.getElementById('modal-description');
+
+        if (itemId) {
+            modalTitle.textContent = 'Editar Item';
+            modalDescription.textContent = 'Edite as informações do item selecionado.';
+            this.loadItemData(itemId);
+        } else {
+            modalTitle.textContent = 'Anotar Novo Registro';
+            modalDescription.textContent = 'Adicione um novo registro ao estoque preenchendo as informações abaixo.';
+            this.clearForm();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('verification-date').value = today;
+        }
+
+        modal.classList.add('active');
+        this.validateForm();
+    }
+
+    closeModal() {
+        document.getElementById('item-modal').classList.remove('active');
+        this.editingItemId = null;
+        this.clearForm();
+    }
+
+    loadItemData(itemId) {
+        const item = this.stockItems.find(i => i.id === itemId);
+        if (!item) return;
+        document.getElementById('material-name').value = item.name;
+        document.getElementById('material-id').value = item.materialId;
+        document.getElementById('material-desc').value = item.desc || '';
+        document.getElementById('quantity').value = item.quantity;
+        document.getElementById('status').value = item.status;
+        document.getElementById('location').value = item.location;
+        document.getElementById('discard-reason').value = item.discardReason || '';
+        document.getElementById('verification-date').value = item.verificationDate || '';
+        document.getElementById('expiry-date').value = item.expiryDate || '';
+        document.getElementById('responsible').value = item.responsible;
+    }
+
+    clearForm() {
+        document.getElementById('item-form').reset();
+        this.validateForm();
+    }
+
+    validateForm() {
+        const required = ['material-name','material-id','quantity','status','location','verification-date','responsible'];
+        const isValid = required.every(id => document.getElementById(id).value.trim() !== '');
+        document.getElementById('save-item-btn').disabled = !isValid;
+    }
+
+    async saveItem() {
+    const formData = {
+    "pn": document.getElementById('material-name').value,
+    "ecode": document.getElementById('material-id').value,
+    "descricao": document.getElementById('material-desc').value,
+    "localizacao_no_estoque": document.getElementById('location').value,
+    "motivo_de_descarte": document.getElementById('discard-reason').value,
+    "data_de_verificacao": document.getElementById('verification-date').value,
+    "data_de_validade": document.getElementById('expiry-date').value,
+    "responsavel_pelo_registro": document.getElementById('responsible').value,
+    "quantidade": parseInt(document.getElementById('quantity').value),
+    "status": document.getElementById('status').value
+};
+
+    // Salva localmente (continua igual)
+    if (this.editingItemId) {
+        const idx = this.stockItems.findIndex(i => i.id === this.editingItemId);
+        if (idx !== -1) {
+            this.stockItems[idx] = {
+                ...this.stockItems[idx],
+                ...formData
+            };
+        }
+    } else {
+        this.stockItems.push({
+            id: Date.now().toString(),
+            ...formData
+        });
+    }
+
+    localStorage.setItem('stockItems', JSON.stringify(this.stockItems));
+    this.renderTable();
+    this.updateItemsCount();
+    this.closeModal();
+
+    // --- Envia para o SUPABASE ---
+    try {
+        const response = await fetch('https://mqjhjcdfgksdfxfzfdlk.supabase.co/rest/v1/GESTAO_DE_ESTOQUE', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'apikey': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xamhqY2RmZ2tzZGZ4ZnpmZGxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDQ0MjAsImV4cCI6MjA3NDk4MDQyMH0.Kbw_ai5CndZvJQ8SJEeVjPHIDsp-6flf941kIJpG6XY",
+                'Authorization': "Bearer " + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xamhqY2RmZ2tzZGZ4ZnpmZGxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDQ0MjAsImV4cCI6MjA3NDk4MDQyMH0.Kbw_ai5CndZvJQ8SJEeVjPHIDsp-6flf941kIJpG6XY",
+                'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            console.error("Erro Supabase:", error);
+        } else {
+            console.log("Registro salvo no Supabase!");
+        }
+    } catch (err) {
+        console.error("Erro de conexão com Supabase:", err);
+    }
+}
+
+
+    deleteItem(itemId) {
+        if (!confirm('Deseja realmente remover este item?')) return;
+        this.stockItems = this.stockItems.filter(i => i.id !== itemId);
+        localStorage.setItem('stockItems', JSON.stringify(this.stockItems));
+        this.renderTable();
+        this.updateItemsCount();
+    }
+
+    getFilteredItems() {
+        let filtered = this.stockItems;
+        if (this.currentFilter !== 'ALL') filtered = filtered.filter(i => i.status === this.currentFilter);
+        if (this.currentSearch) {
+            const term = this.currentSearch.toLowerCase();
+            filtered = filtered.filter(i => i.name.toLowerCase().includes(term) || i.materialId.toLowerCase().includes(term));
+        }
+        return filtered;
+    }
+
+    renderTable() {
+        const tbody = document.getElementById('stock-table-body');
+        const noItemsMsg = document.getElementById('no-items-message');
+        const filtered = this.getFilteredItems();
+    
+        if (!filtered.length) {
+            tbody.innerHTML = '';
+            noItemsMsg.style.display = 'block';
+            document.getElementById('items-count').textContent = `Exibindo 0 de ${this.stockItems.length} itens`;
+            return;
+        }
+        noItemsMsg.style.display = 'none';
+        tbody.innerHTML = '';
+    
+        filtered.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.name || '-'}</td>
+                <td>${item.materialId || '-'}</td>
+                <td>${item.quantity ?? '-'}</td>
+                <td>${item.responsible || item.verifiedBy || '-'}</td>
+                <td>
+                    <span class="status-badge ${this.getStatusClass(item.status)}">
+                        ${item.status || '-'}
+                    </span>
+                </td>
+                <td>${item.discardReason || '-'}</td>
+                <td>
+                    <a href="#" class="action-link action-edit" data-id="${item.id}">Editar</a>
+                    <a href="#" class="action-link action-delete" data-id="${item.id}">Excluir</a>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    
+        tbody.querySelectorAll('.action-edit').forEach(link =>
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const id = e.currentTarget.dataset.id;
+                this.openModal(id);
+            })
+        );
+    
+        tbody.querySelectorAll('.action-delete').forEach(link =>
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const id = e.currentTarget.dataset.id;
+                this.deleteItem(id);
+            })
+        );
+    
+        this.updateItemsCount();
+    }
+
+    getStatusClass(status) {
+        const classes = {
+            'OK': 'status-ok',
+            'EM FALTA': 'status-falta',
+            'VENCIDO': 'status-vencido',
+            'EM DESCARTE': 'status-descarte'
+        };
+        return classes[status] || '';
+    }
+
+    updateItemsCount() {
+        document.getElementById('items-count').textContent = `Exibindo ${this.getFilteredItems().length} de ${this.stockItems.length} itens`;
+    }
+}
+
+// Inicializa
+const stockManager = new StockManager();
+window.stockManager = stockManager;
+
+// Banco de Materiais
 const materiaisDB = [
     { name: "SOLVE TS 500 LTT", code: "79868", desc: "SOLVENTE PARA LIMPEZA MANUAL DE PEÇ" },
     { name: "MOLYKOTE 111", code: "832780", desc: "VALVE LUBRICANT FOR POTABLE WATER" },
@@ -43,305 +296,38 @@ const materiaisDB = [
     { name: "S1006-KIT-A", code: "5263329", desc: "ADESIVO, EPOXI, CABLAGENS ELETRICAS" }
 ];
 
-// === SUPABASE CONFIG ===
-import { createClient } from "https://esm.sh/@supabase/supabase-js";
-
-const SUPABASE_URL = "https://mqjhjcdfgksdfxfzfdlk.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xamhqY2RmZ2tzZGZ4ZnpmZGxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDQ0MjAsImV4cCI6MjA3NDk4MDQyMH0.Kbw_ai5CndZvJQ8SJEeVjPHIDsp-6flf941kIJpG6XY";
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// === Função para carregar selects ===
-function carregarMateriais() {
-    const nameSelect = document.getElementById('material-name');
-    const codeSelect = document.getElementById('material-id');
-    const descSelect = document.getElementById('material-desc');
-
-    [nameSelect, codeSelect, descSelect].forEach(sel => {
-        sel.innerHTML = '<option value="">Selecione...</option>';
-    });
-
+// Popula selects
+['material-name','material-id','material-desc'].forEach(id => {
+    const select = document.getElementById(id);
     materiaisDB.forEach(m => {
-        let optName = document.createElement('option');
-        optName.value = m.name;
-        optName.textContent = m.name;
-        nameSelect.appendChild(optName);
-
-        let optCode = document.createElement('option');
-        optCode.value = m.code;
-        optCode.textContent = m.code;
-        codeSelect.appendChild(optCode);
-
-        let optDesc = document.createElement('option');
-        optDesc.value = m.desc;
-        optDesc.textContent = m.desc;
-        descSelect.appendChild(optDesc);
+        const opt = document.createElement('option');
+        if (id==='material-name') opt.value = m.name;
+        if (id==='material-id') opt.value = m.code;
+        if (id==='material-desc') opt.value = m.desc;
+        opt.textContent = opt.value;
+        select.appendChild(opt);
     });
-}
+});
 
-// === Sincronização entre selects ===
-function sincronizarSelects() {
-    document.getElementById('material-name').addEventListener('change', () => {
-        const match = materiaisDB.find(m => m.name === document.getElementById('material-name').value);
-        if (match) {
-            document.getElementById('material-id').value = match.code;
-            document.getElementById('material-desc').value = match.desc;
-        }
-    });
-    document.getElementById('material-id').addEventListener('change', () => {
-        const match = materiaisDB.find(m => m.code === document.getElementById('material-id').value);
-        if (match) {
-            document.getElementById('material-name').value = match.name;
-            document.getElementById('material-desc').value = match.desc;
-        }
-    });
-    document.getElementById('material-desc').addEventListener('change', () => {
-        const value = document.getElementById('material-desc').value.trim().toLowerCase();
-        const match = materiaisDB.find(m => m.desc.toLowerCase() === value);
-        if (match) {
-            document.getElementById('material-name').value = match.name;
-            document.getElementById('material-id').value = match.code;
-        }
-    });
-}
-
-// === Classe StockManager ===
-class StockManager {
-    constructor() {
-        this.stockItems = [];
-        this.currentFilter = 'ALL';
-        this.currentSearch = '';
-        this.editingItemId = null;
-        this.init();
+// Sincroniza selects
+document.getElementById('material-name').addEventListener('change', () => {
+    const match = materiaisDB.find(m => m.name === document.getElementById('material-name').value);
+    if (match) { 
+        document.getElementById('material-id').value = match.code; 
+        document.getElementById('material-desc').value = match.desc; 
     }
-
-    async init() {
-        this.bindEvents();
-        await this.loadFromSupabase();
-        this.renderTable();
-        this.updateItemsCount();
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('verification-date').value = today;
+});
+document.getElementById('material-id').addEventListener('change', () => {
+    const match = materiaisDB.find(m => m.code === document.getElementById('material-id').value);
+    if (match) { 
+        document.getElementById('material-name').value = match.name; 
+        document.getElementById('material-desc').value = match.desc; 
     }
-
-    bindEvents() {
-        document.getElementById('add-item-btn').addEventListener('click', () => this.openModal());
-        document.getElementById('close-modal-btn').addEventListener('click', () => this.closeModal());
-        document.getElementById('cancel-modal-btn').addEventListener('click', () => this.closeModal());
-
-        document.getElementById('item-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            await this.saveItem();
-        });
-
-        document.getElementById('save-item-btn').addEventListener('click', async (e) => {
-            e.preventDefault();
-            await this.saveItem();
-        });
-
-        document.getElementById('clear-form-btn').addEventListener('click', () => this.clearForm());
-
-        document.getElementById('search-input').addEventListener('input', e => {
-            this.currentSearch = e.target.value;
-            this.renderTable();
-        });
-
-        document.getElementById('status-filter').addEventListener('change', e => {
-            this.currentFilter = e.target.value;
-            this.renderTable();
-        });
-
-        document.getElementById('item-form').addEventListener('input', () => this.validateForm());
-
-        document.getElementById('item-modal').addEventListener('click', e => {
-            if (e.target.id === 'item-modal') this.closeModal();
-        });
-
-        document.getElementById('material-name').addEventListener('input', e => {
-            const matId = document.getElementById('material-id');
-            if (!matId.value && e.target.value) matId.value = `MAT-2024-${Date.now().toString().slice(-6)}`;
-        });
+});
+document.getElementById('material-desc').addEventListener('change', () => {
+    const match = materiaisDB.find(m => m.desc === document.getElementById('material-desc').value);
+    if (match) { 
+        document.getElementById('material-name').value = match.name; 
+        document.getElementById('material-id').value = match.code; 
     }
-
-    async loadFromSupabase() {
-        const { data, error } = await supabase.from("stock_items").select("*");
-        if (error) {
-            console.error("Erro ao carregar do Supabase:", error);
-        } else {
-            this.stockItems = data;
-        }
-    }
-
-    async saveItem() {
-        const formData = {
-            name: document.getElementById('material-name').value || "-",
-            materialId: document.getElementById('material-id').value || "-",
-            desc: document.getElementById('material-desc').value || "-",
-            quantity: parseInt(document.getElementById('quantity').value) || 0,
-            status: document.getElementById('status').value || "-",
-            location: document.getElementById('location').value || "-",
-            discardReason: document.getElementById('discard-reason').value || "-",
-            verificationDate: document.getElementById('verification-date').value || "-",
-            expiryDate: document.getElementById('expiry-date').value || "-",
-            responsible: document.getElementById('responsible').value || "-"
-        };
-
-        let result;
-        if (this.editingItemId) {
-            result = await supabase.from("stock_items").update(formData).eq("id", this.editingItemId);
-        } else {
-            result = await supabase.from("stock_items").insert([formData]);
-        }
-
-        if (result.error) {
-            console.error("Erro ao salvar no Supabase:", result.error);
-        } else {
-            await this.loadFromSupabase();
-            this.renderTable();
-            this.updateItemsCount();
-            this.closeModal();
-        }
-    }
-
-    async deleteItem(itemId) {
-        if (!confirm('Deseja realmente remover este item?')) return;
-        const { error } = await supabase.from("stock_items").delete().eq("id", itemId);
-        if (error) {
-            console.error("Erro ao excluir:", error);
-        } else {
-            await this.loadFromSupabase();
-            this.renderTable();
-            this.updateItemsCount();
-        }
-    }
-
-    loadItemData(itemId) {
-        const item = this.stockItems.find(i => i.id == itemId);
-        if (!item) return;
-        document.getElementById('material-name').value = item.name;
-        document.getElementById('material-id').value = item.materialId;
-        document.getElementById('material-desc').value = item.desc || '';
-        document.getElementById('quantity').value = item.quantity;
-        document.getElementById('status').value = item.status;
-        document.getElementById('location').value = item.location;
-        document.getElementById('discard-reason').value = item.discardReason || '';
-        document.getElementById('verification-date').value = item.verificationDate || '';
-        document.getElementById('expiry-date').value = item.expiryDate || '';
-        document.getElementById('responsible').value = item.responsible;
-    }
-
-    clearForm() {
-        document.getElementById('item-form').reset();
-        this.validateForm();
-    }
-
-    validateForm() {
-        const required = ['material-name','material-id','quantity','status','location','verification-date','responsible'];
-        const isValid = required.every(id => document.getElementById(id).value.trim() !== '');
-        document.getElementById('save-item-btn').disabled = !isValid;
-    }
-
-    getFilteredItems() {
-        let filtered = this.stockItems;
-        if (this.currentFilter !== 'ALL') filtered = filtered.filter(i => i.status === this.currentFilter);
-        if (this.currentSearch) {
-            const term = this.currentSearch.toLowerCase();
-            filtered = filtered.filter(i => i.name.toLowerCase().includes(term) || i.materialId.toLowerCase().includes(term));
-        }
-        return filtered;
-    }
-
-    renderTable() {
-        const tbody = document.getElementById('stock-table-body');
-        const noItemsMsg = document.getElementById('no-items-message');
-        const filtered = this.getFilteredItems();
-
-        if (!filtered.length) {
-            tbody.innerHTML = '';
-            noItemsMsg.style.display = 'block';
-            document.getElementById('items-count').textContent = `Exibindo 0 de ${this.stockItems.length} itens`;
-            return;
-        }
-
-        noItemsMsg.style.display = 'none';
-        tbody.innerHTML = '';
-
-        filtered.forEach(item => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${item.name ?? '-'}</td>
-                <td>${item.materialId ?? '-'}</td>
-                <td>${item.quantity ?? '-'}</td>
-                <td>${item.responsible ?? '-'}</td>
-                <td>
-                    <span class="status-badge ${this.getStatusClass(item.status)}">
-                        ${item.status ?? '-'}
-                    </span>
-                </td>
-                <td>${item.discardReason ?? '-'}</td>
-                <td>
-                    <a href="#" class="action-link action-edit" data-id="${item.id}">Editar</a>
-                    <a href="#" class="action-link action-delete" data-id="${item.id}">Excluir</a>
-                </td>
-            `;
-            tbody.appendChild(row);
-        });
-
-        tbody.querySelectorAll('.action-edit').forEach(link =>
-            link.addEventListener('click', e => {
-                e.preventDefault();
-                const id = e.currentTarget.dataset.id;
-                this.openModal(id);
-            })
-        );
-
-        tbody.querySelectorAll('.action-delete').forEach(link =>
-            link.addEventListener('click', e => {
-                e.preventDefault();
-                const id = e.currentTarget.dataset.id;
-                this.deleteItem(id);
-            })
-        );
-
-        this.updateItemsCount();
-    }
-
-    getStatusClass(status) {
-        const classes = {
-            'OK': 'status-ok',
-            'EM FALTA': 'status-falta',
-            'VENCIDO': 'status-vencido',
-            'EM DESCARTE': 'status-descarte'
-        };
-        return classes[status] || '';
-    }
-
-    updateItemsCount() {
-        document.getElementById('items-count').textContent = `Exibindo ${this.getFilteredItems().length} de ${this.stockItems.length} itens`;
-    }
-
-    openModal(itemId = null) {
-        this.editingItemId = itemId;
-        if (itemId) {
-            this.loadItemData(itemId);
-            document.getElementById('modal-title').textContent = 'Editar Registro';
-        } else {
-            this.clearForm();
-            document.getElementById('modal-title').textContent = 'Anotar Registro';
-        }
-        document.getElementById('item-modal').style.display = 'block';
-        this.validateForm();
-    }
-
-    closeModal() {
-        document.getElementById('item-modal').style.display = 'none';
-        this.editingItemId = null;
-    }
-}
-
-// === Inicialização ===
-document.addEventListener('DOMContentLoaded', () => {
-    carregarMateriais();
-    sincronizarSelects();
-    new StockManager();
 });
