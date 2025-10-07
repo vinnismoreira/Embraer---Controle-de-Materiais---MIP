@@ -351,14 +351,14 @@ const sidebar = document.querySelector('.sidebar');
 const menuToggle = document.getElementById('menu-toggle');
 
 if (menuToggle && sidebar) {
-  // Alterna abrir/fechar a sidebar ao clicar no botão ☰
+  // Abre/fecha sidebar
   menuToggle.addEventListener('click', (e) => {
     e.stopPropagation();
     sidebar.classList.toggle('active');
     document.body.classList.toggle('sidebar-open');
   });
 
-  // Fecha a sidebar se clicar fora dela
+  // Fecha ao clicar fora
   document.addEventListener('click', (e) => {
     if (
       sidebar.classList.contains('active') &&
