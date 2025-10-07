@@ -152,10 +152,6 @@ async function simulateAuthentication() {
     window.location.href = "/index.html";
 }
 
-    // Se deu certo, pode redirecionar para o painel principal:
-    window.location.href = "/src/home/index.html";
-}
-
 // Create notification element
 function createNotification(message, type) {
     const notification = document.createElement('div');
