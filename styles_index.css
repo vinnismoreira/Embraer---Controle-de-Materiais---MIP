@@ -776,32 +776,64 @@ textarea {
   margin-left: 0;
 }
 
-/* ===== BOTÃO DE FECHAR (X) DENTRO DA SIDEBAR ===== */
-.close-sidebar {
-  position: absolute;
+/* === Checkbox hack: apenas para abrir/fechar a sidebar === */
+#sidebar-checkbox { display: none; }
+
+/* Botão azul (hamburger) */
+label.sidebar-toggle {
+  position: fixed;
   top: 15px;
   left: 15px;
+  z-index: 2100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 45px;
+  background: #1245b3;
+  border-radius: 10px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 20px;
+  transition: all 0.25s ease;
+}
+
+label.sidebar-toggle:hover {
+  background: #0b2d73;
+}
+
+label.sidebar-toggle .hamburger {
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* X dentro da sidebar */
+.sidebar .close-btn {
+  display: none;
+  position: absolute;
+  top: 12px;
+  left: 12px;
   background: none;
   border: none;
   color: #1245b3;
-  font-size: 26px;
+  font-size: 22px;
   cursor: pointer;
-  display: none; /* escondido por padrão */
-  z-index: 2001;
-  transition: color 0.2s ease;
+  z-index: 2101;
+  padding: 6px;
+  line-height: 1;
 }
 
-.close-sidebar:hover {
-  color: #0b2d73;
+/* Abre sidebar e mostra X */
+#sidebar-checkbox:checked ~ .sidebar {
+  transform: translateX(0); /* sidebar aberta */
 }
 
-/* Mostra o X quando a sidebar estiver aberta */
-.sidebar.open .close-sidebar {
-  display: block;
-}
-
-/* Esconde o botão azul quando o menu abre */
-.sidebar.open ~ #sidebar-toggle {
-  opacity: 0;
+#sidebar-checkbox:checked ~ label.sidebar-toggle {
+  opacity: 0;           /* esconde o botão azul */
   pointer-events: none;
+  transform: scale(0.95);
+}
+
+#sidebar-checkbox:checked ~ .sidebar .close-btn {
+  display: block;       /* mostra X dentro da sidebar */
 }
