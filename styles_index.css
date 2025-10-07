@@ -776,12 +776,19 @@ textarea {
   margin-left: 0;
 }
 
-.sidebar-header {
+.sidebar-embraer {
+    position: fixed;
+    top: 0;
+    left: -260px;
+    width: 260px;
+    height: 100vh;
+    background-color: #eff6ff;
+    border-right: 1px solid #bfdbfe;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    transition: left 0.3s ease;
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    border-bottom: 1px solid #bfdbfe;
-    background-color: #e0f2fe;
-    color: #1d4ed8;
+    z-index: 150;
+    font-family: "Segoe UI", Arial, sans-serif;
   }
