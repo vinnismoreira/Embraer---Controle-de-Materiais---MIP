@@ -775,3 +775,13 @@ textarea {
 .sidebar.closed ~ .main-content {
   margin-left: 0;
 }
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #bfdbfe;
+    background-color: #e0f2fe;
+    color: #1d4ed8;
+  }
