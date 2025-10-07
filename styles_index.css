@@ -776,19 +776,32 @@ textarea {
   margin-left: 0;
 }
 
-.sidebar-embraer {
-    position: fixed;
-    top: 0;
-    left: -260px;
-    width: 260px;
-    height: 100vh;
-    background-color: #eff6ff;
-    border-right: 1px solid #bfdbfe;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-    transition: left 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    z-index: 150;
-    font-family: "Segoe UI", Arial, sans-serif;
-  }
+/* ===== BOTÃO DE FECHAR (X) ===== */
+.close-sidebar {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: none;
+  border: none;
+  color: #1245b3;
+  font-size: 24px;
+  cursor: pointer;
+  display: none; /* escondido por padrão */
+  z-index: 2001;
+  transition: color 0.2s ease;
+}
+
+.close-sidebar:hover {
+  color: #0b2d73;
+}
+
+/* Quando a sidebar estiver aberta, o X aparece */
+.sidebar.open .close-sidebar {
+  display: block;
+}
+
+/* Quando a sidebar estiver aberta, o botão azul some */
+.sidebar.open ~ .sidebar-toggle {
+  opacity: 0;
+  pointer-events: none;
+}
