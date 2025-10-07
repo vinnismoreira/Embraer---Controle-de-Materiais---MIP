@@ -346,46 +346,35 @@ document.querySelectorAll('.sidebar-item > .sidebar-link').forEach(link => {
   });
 });
 
-// === Sidebar ===
-const sidebar = document.querySelector(".sidebar");
-const toggleBtn = document.getElementById("sidebar-toggle");
-const toggleIcon = toggleBtn.querySelector("i");
+// === Sidebar retrátil ===
+const sidebar = document.querySelector('.sidebar');
+const menuToggle = document.getElementById('menu-toggle');
+const closeSidebar = document.getElementById('close-sidebar');
 
-// Alterna abrir/fechar a sidebar
-toggleBtn.addEventListener("click", (e) => {
-  e.stopPropagation();
-  sidebar.classList.toggle("closed");
+if (menuToggle && closeSidebar && sidebar) {
+  // Abrir sidebar
+  menuToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    sidebar.classList.add('active');
+    document.body.classList.add('sidebar-open');
+  });
 
-  if (sidebar.classList.contains("closed")) {
-    toggleIcon.classList.remove("fa-xmark");
-    toggleIcon.classList.add("fa-bars");
-  } else {
-    toggleIcon.classList.remove("fa-bars");
-    toggleIcon.classList.add("fa-xmark");
-  }
-});
+  // Fechar sidebar
+  closeSidebar.addEventListener('click', (e) => {
+    e.stopPropagation();
+    sidebar.classList.remove('active');
+    document.body.classList.remove('sidebar-open');
+  });
 
-// Fecha ao clicar fora da sidebar
-document.addEventListener("click", (e) => {
-  const clickedOutsideSidebar = !sidebar.contains(e.target) && !toggleBtn.contains(e.target);
-  if (!sidebar.classList.contains("closed") && clickedOutsideSidebar) {
-    sidebar.classList.add("closed");
-    toggleIcon.classList.remove("fa-xmark");
-    toggleIcon.classList.add("fa-bars");
-  }
-});
-
-// === Botão X dentro da sidebar ===
-const closeSidebarBtn = document.createElement("button");
-closeSidebarBtn.classList.add("close-sidebar");
-closeSidebarBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
-sidebar.appendChild(closeSidebarBtn);
-
-// Mostra/esconde o botão azul (já controlado pelo CSS)
-toggleBtn.addEventListener("click", () => {
-  sidebar.classList.add("open");
-});
-
-closeSidebarBtn.addEventListener("click", () => {
-  sidebar.classList.remove("open");
-});
+  // Fechar se clicar fora
+  document.addEventListener('click', (e) => {
+    if (
+      sidebar.classList.contains('active') &&
+      !sidebar.contains(e.target) &&
+      !menuToggle.contains(e.target)
+    ) {
+      sidebar.classList.remove('active');
+      document.body.classList.remove('sidebar-open');
+    }
+  });
+}
