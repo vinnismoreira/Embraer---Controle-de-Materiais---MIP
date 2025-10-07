@@ -385,25 +385,3 @@ if (closeSidebar && sidebar) {
 document.getElementById("registered-count").textContent = registrados;
 document.getElementById("not-registered-count").textContent = naoRegistrados;
 
-// Exibe ou esconde o campo de upload
-document.getElementById("has-image").addEventListener("change", function () {
-    const uploadGroup = document.getElementById("image-upload-group");
-    uploadGroup.style.display = this.value === "Sim" ? "block" : "none";
-});
-
-// Salvar imagem no localStorage
-document.getElementById("image-upload").addEventListener("change", function (event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        const base64Image = e.target.result;
-        localStorage.setItem("anexo-imagem", base64Image); // salva no navegador
-
-        // Mostra a pré-visualização
-        const preview = document.getElementById("preview");
-        preview.innerHTML = `<img src="${base64Image}" alt="Prévia da imagem">`;
-    };
-    reader.readAsDataURL(file);
-});
