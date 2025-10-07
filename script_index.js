@@ -312,5 +312,16 @@ document.querySelectorAll('.sidebar-item > .sidebar-link').forEach(link => {
     link.addEventListener('click', e => {
         const parent = link.parentElement;
         parent.classList.toggle('active');
+
+        // === Botão para abrir/fechar a sidebar ===
+const toggleBtn = document.createElement("button");
+toggleBtn.className = "sidebar-toggle";
+toggleBtn.innerHTML = '<i class="fa-solid fa-bars"></i>';
+document.body.appendChild(toggleBtn);
+
+const sidebar = document.querySelector(".sidebar");
+toggleBtn.addEventListener("click", () => {
+  sidebar.classList.toggle("closed");
+});
     });
 });

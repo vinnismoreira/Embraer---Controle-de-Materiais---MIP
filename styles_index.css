@@ -657,16 +657,17 @@ textarea {
   
 /* Sidebar */
 .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 220px;
-    height: 100%;
-    background-color: #eff6ff;
-    border-right: 1px solid #bfdbfe;
-    padding-top: 1rem;
-    overflow-y: auto;
-    z-index: 999;
+  position: fixed;
+  top: 60px; /* altura do header */
+  left: 0;
+  width: 240px;
+  height: calc(100vh - 60px);
+  background: #0b1834;
+  color: #fff;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.3);
+  overflow-y: auto;
+  transition: transform 0.3s ease;
+  z-index: 999;
 }
 
 .sidebar-menu {
@@ -722,4 +723,55 @@ textarea {
 /* Toggle dropdown */
 .sidebar-item.active .sidebar-submenu {
     display: block;
+}
+
+/* ===== Botão de abrir/fechar sidebar ===== */
+.sidebar-toggle {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1001;
+  background: #1245b3;
+  color: #fff;
+  border: none;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 18px;
+  transition: background 0.3s ease;
+}
+
+.sidebar-toggle:hover {
+  background: #12244f;
+}
+
+/* ===== Sidebar padrão ===== */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 240px;
+  height: 100vh;
+  background: #ffffff;
+  color: white;
+  padding: 20px;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.3);
+  transition: transform 0.3s ease;
+}
+
+/* Sidebar recolhida */
+.sidebar.closed {
+  transform: translateX(-100%);
+}
+
+/* Ajusta o conteúdo conforme a sidebar */
+.main-content {
+  margin-top: 60px; /* espaço do header */
+  margin-left: 240px; /* espaço da sidebar */
+  padding: 30px;
+  transition: margin 0.3s ease;
+}
+
+.sidebar.closed ~ .main-content {
+  margin-left: 0;
 }
