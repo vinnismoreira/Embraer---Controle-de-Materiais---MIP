@@ -1,9 +1,3 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const SUPABASE_URL = "https://mqjhjcdfgksdfxfzfdlk.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xamhqY2RmZ2tzZGZ4ZnpmZGxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDQ0MjAsImV4cCI6MjA3NDk4MDQyMH0.Kbw_ai5CndZvJQ8SJEeVjPHIDsp-6flf941kIJpG6XY";
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
 // =======================
 // Flight info fixa: SJC e temperatura
 // =======================
@@ -11,20 +5,20 @@ function setupFlightInfoFixed() {
     const cityElement = document.getElementById('city');
     const tempElement = document.getElementById('temperature');
 
-    if (!cityElement || !tempElement) return;
-
+    // Cidade fixa
     cityElement.textContent = 'São José dos Campos';
 
-    const lat = -23.1896;
-    const lon = -45.8841;
-    const API_KEY = "SEU_API_KEY"; // substitua pela sua chave OpenWeatherMap
+    // Substitua SEU_API_KEY pela sua chave do OpenWeatherMap
+    const lat = -23.1896; // Latitude SJC
+    const lon = -45.8841; // Longitude SJC
 
     async function updateTemperature() {
         try {
-            const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`);
-            const data = await res.json();
-            if (data && data.main) {
-                tempElement.textContent = `${Math.round(data.main.temp)}°C`;
+            const weatherResp = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=SEU_API_KEY`);
+            const weatherData = await weatherResp.json();
+
+            if (weatherData && weatherData.main) {
+                tempElement.textContent = `${Math.round(weatherData.main.temp)}°C`;
             }
         } catch (err) {
             console.error('Erro ao obter clima:', err);
@@ -33,90 +27,107 @@ function setupFlightInfoFixed() {
     }
 
     updateTemperature();
-    setInterval(updateTemperature, 600000); // Atualiza a cada 10 min
+
+    // Atualiza temperatura a cada 10 minutos
+    setInterval(updateTemperature, 600000);
 }
 
-// =======================
-// Mostrar / esconder senha
-// =======================
+document.addEventListener('DOMContentLoaded', function() {
+    setupFlightInfoFixed();
+    setupPasswordToggle();
+    setupFormSubmission();
+    setupInputEffects();
+});
+
+// Password toggle functionality
 function setupPasswordToggle() {
     const passwordInput = document.getElementById('password');
     const passwordToggle = document.getElementById('passwordToggle');
     const eyeIcon = document.getElementById('eyeIcon');
     const eyeOffIcon = document.getElementById('eyeOffIcon');
-
-    if (!passwordInput || !passwordToggle) return;
-
-    passwordToggle.addEventListener('click', () => {
+    
+    if (!passwordInput || !passwordToggle || !eyeIcon || !eyeOffIcon) return;
+    
+    passwordToggle.addEventListener('click', function() {
         const isPassword = passwordInput.type === 'password';
-        passwordInput.type = isPassword ? 'text' : 'password';
-        eyeIcon.classList.toggle('hidden');
-        eyeOffIcon.classList.toggle('hidden');
+        
+        if (isPassword) {
+            passwordInput.type = 'text';
+            eyeIcon.classList.add('hidden');
+            eyeOffIcon.classList.remove('hidden');
+        } else {
+            passwordInput.type = 'password';
+            eyeIcon.classList.remove('hidden');
+            eyeOffIcon.classList.add('hidden');
+        }
     });
 }
 
-// =======================
-// Efeitos de foco nos inputs
-// =======================
-function setupInputEffects() {
-    const inputs = document.querySelectorAll('input[type="email"], input[type="password"]');
-    inputs.forEach(input => {
-        input.addEventListener('focus', () => input.parentElement.classList.add('focused'));
-        input.addEventListener('blur', () => input.parentElement.classList.remove('focused'));
-    });
-}
-
-// =======================
-// Autenticação com Supabase + restrição de domínio
-// =======================
+// Form submission with loading state
 function setupFormSubmission() {
     const loginForm = document.getElementById('loginForm');
     const loginButton = document.getElementById('loginButton');
     const buttonContent = document.getElementById('buttonContent');
     const loadingContent = document.getElementById('loadingContent');
-
-    if (!loginForm) return;
-
-    loginForm.addEventListener('submit', async (e) => {
+    
+    if (!loginForm || !loginButton || !buttonContent || !loadingContent) return;
+    
+    loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
-
+        
         loginButton.disabled = true;
         buttonContent.classList.add('hidden');
         loadingContent.classList.remove('hidden');
 
         try {
-            const email = document.getElementById('email').value.trim();
+            const email = document.getElementById('email').value.trim().toLowerCase();
             const password = document.getElementById('password').value.trim();
-            const allowedDomains = ["embraer.com.br", "globmail.com.br"];
-            const domain = email.split("@")[1];
 
-            if (!allowedDomains.includes(domain)) {
-                throw new Error("Apenas emails corporativos são permitidos.");
-            }
+            // Domínios permitidos
+            const allowedDomains = ['@embraer.com.br', '@globmail.com.br'];
+            const isAllowed = allowedDomains.some(domain => email.endsWith(domain));
 
-            const { error } = await supabase.auth.signInWithPassword({ email, password });
+            if (!isAllowed) throw new Error('Apenas e-mails corporativos autorizados.');
+
+            // Autenticação real no Supabase
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
             if (error) throw error;
 
-            createNotification("Login realizado com sucesso!", "success");
-            window.location.href = "/index.html";
+            console.log('Usuário logado:', data.user);
+            showSuccessMessage();
+
+            setTimeout(() => {
+                window.location.href = '/index.html'; // rota interna
+            }, 1000);
+
         } catch (error) {
-            console.error(error);
-            createNotification(error.message || "Erro ao autenticar.", "error");
+            console.error('Falha na autenticação:', error);
+            showErrorMessage(error.message);
         } finally {
             loginButton.disabled = false;
             buttonContent.classList.remove('hidden');
             loadingContent.classList.add('hidden');
         }
     });
+
+    function showSuccessMessage() {
+        const notification = createNotification('Autenticação realizada com sucesso!', 'success');
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
+    }
+
+    function showErrorMessage(msg = 'Falha na autenticação. Verifique suas credenciais.') {
+        const notification = createNotification(msg, 'error');
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
+    }
 }
 
-// =======================
-// Notificações visuais
-// =======================
+// Create notification element
 function createNotification(message, type) {
     const notification = document.createElement('div');
-    notification.textContent = message;
     notification.className = `notification notification-${type}`;
+    notification.textContent = message;
     notification.style.cssText = `
         position: fixed;
         top: 2rem;
@@ -128,20 +139,25 @@ function createNotification(message, type) {
         z-index: 1000;
         animation: slideInRight 0.3s ease-out;
         max-width: 300px;
-        ${type === 'success'
-            ? 'background: linear-gradient(135deg, rgb(34, 197, 94), rgb(22, 163, 74));'
-            : 'background: linear-gradient(135deg, rgb(239, 68, 68), rgb(220, 38, 38));'}
+        ${type === 'success' 
+            ? 'background: linear-gradient(135deg, rgb(34, 197, 94), rgb(22, 163, 74));' 
+            : 'background: linear-gradient(135deg, rgb(239, 68, 68), rgb(220, 38, 38));'
+        }
     `;
-    document.body.appendChild(notification);
-    setTimeout(() => notification.remove(), 3000);
+    return notification;
 }
 
-// =======================
-// Inicialização
-// =======================
-document.addEventListener('DOMContentLoaded', function() {
-    setupFlightInfoFixed();
-    setupPasswordToggle();
-    setupInputEffects();
-    setupFormSubmission();
-});
+// Setup input focus effects
+function setupInputEffects() {
+    const inputs = document.querySelectorAll('input[type="email"], input[type="password"]');
+    
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+        
+        input.addEventListener('blur', function() {
+            this.parentElement.classList.remove('focused');
+        });
+    });
+}
