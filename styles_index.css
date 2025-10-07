@@ -836,3 +836,17 @@ body.sidebar-open {
         font-size: 0.7rem;
     }
 }
+
+/* ===== Correção da logo: mantém original no desktop ===== */
+.embraer-logo img {
+    max-width: 150px;
+    height: auto; /* volta ao tamanho natural no desktop */
+}
+
+/* Mantém a versão reduzida apenas no mobile */
+@media (max-width: 768px) {
+    .embraer-logo img {
+        height: 20px; /* já estava correto para mobile */
+        max-width: 100px;
+    }
+}
