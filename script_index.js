@@ -346,27 +346,19 @@ document.querySelectorAll('.sidebar-item > .sidebar-link').forEach(link => {
   });
 });
 
-// === Sidebar retrátil ===
+// === Sidebar retrátil (apenas um botão) ===
 const sidebar = document.querySelector('.sidebar');
 const menuToggle = document.getElementById('menu-toggle');
-const closeSidebar = document.getElementById('close-sidebar');
 
-if (menuToggle && closeSidebar && sidebar) {
-  // Abrir sidebar
+if (menuToggle && sidebar) {
+  // Alterna abrir/fechar a sidebar ao clicar no botão ☰
   menuToggle.addEventListener('click', (e) => {
     e.stopPropagation();
-    sidebar.classList.add('active');
-    document.body.classList.add('sidebar-open');
+    sidebar.classList.toggle('active');
+    document.body.classList.toggle('sidebar-open');
   });
 
-  // Fechar sidebar ao clicar no "X"
-  closeSidebar.addEventListener('click', (e) => {
-    e.stopPropagation();
-    sidebar.classList.remove('active');
-    document.body.classList.remove('sidebar-open');
-  });
-
-  // Fechar se clicar fora da sidebar
+  // Fecha a sidebar se clicar fora dela
   document.addEventListener('click', (e) => {
     if (
       sidebar.classList.contains('active') &&
@@ -378,17 +370,3 @@ if (menuToggle && closeSidebar && sidebar) {
     }
   });
 }
-
-// Garantir funcionamento após DOM carregado (fallback extra)
-document.addEventListener('DOMContentLoaded', () => {
-  const sidebar = document.querySelector('.sidebar');
-  const closeSidebar = document.getElementById('close-sidebar');
-
-  if (closeSidebar && sidebar) {
-    closeSidebar.addEventListener('click', (e) => {
-      e.stopPropagation();
-      sidebar.classList.remove('active');
-      document.body.classList.remove('sidebar-open');
-    });
-  }
-});
