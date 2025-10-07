@@ -124,13 +124,21 @@ function setupFormSubmission() {
     }
 }
 
-// Simulate authentication API call
-function simulateAuthentication() {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            Math.random() > 0.3 ? resolve() : reject(new Error('Invalid credentials'));
-        }, 2000);
+async function simulateAuthentication() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
     });
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    // Se deu certo, pode redirecionar para o painel principal:
+    window.location.href = "/src/home/index.html";
 }
 
 // Create notification element
