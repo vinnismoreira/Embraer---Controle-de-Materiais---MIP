@@ -359,14 +359,14 @@ if (menuToggle && closeSidebar && sidebar) {
     document.body.classList.add('sidebar-open');
   });
 
-  // Fechar sidebar
+  // Fechar sidebar ao clicar no "X"
   closeSidebar.addEventListener('click', (e) => {
     e.stopPropagation();
     sidebar.classList.remove('active');
     document.body.classList.remove('sidebar-open');
   });
 
-  // Fechar se clicar fora
+  // Fechar se clicar fora da sidebar
   document.addEventListener('click', (e) => {
     if (
       sidebar.classList.contains('active') &&
@@ -378,3 +378,17 @@ if (menuToggle && closeSidebar && sidebar) {
     }
   });
 }
+
+// Garantir funcionamento após DOM carregado (fallback extra)
+document.addEventListener('DOMContentLoaded', () => {
+  const sidebar = document.querySelector('.sidebar');
+  const closeSidebar = document.getElementById('close-sidebar');
+
+  if (closeSidebar && sidebar) {
+    closeSidebar.addEventListener('click', (e) => {
+      e.stopPropagation();
+      sidebar.classList.remove('active');
+      document.body.classList.remove('sidebar-open');
+    });
+  }
+});
