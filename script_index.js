@@ -307,3 +307,10 @@ document.getElementById('material-desc').addEventListener('change', () => {
     console.log("✅ Conectado ao Supabase com sucesso!");
   }
 })();
+
+document.querySelectorAll('.sidebar-item > .sidebar-link').forEach(link => {
+    link.addEventListener('click', e => {
+        const parent = link.parentElement;
+        parent.classList.toggle('active');
+    });
+});

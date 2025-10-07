@@ -655,3 +655,71 @@ textarea {
     animation: pulse 0.8s infinite;
   }
   
+/* Sidebar */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 220px;
+    height: 100%;
+    background-color: #eff6ff;
+    border-right: 1px solid #bfdbfe;
+    padding-top: 1rem;
+    overflow-y: auto;
+    z-index: 999;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-item {
+    border-bottom: 1px solid #dbeafe;
+}
+
+.sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+    color: #1e40af;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.sidebar-link:hover {
+    background-color: #dbeafe;
+}
+
+.dropdown-icon {
+    font-size: 0.75rem;
+}
+
+.sidebar-submenu {
+    list-style: none;
+    padding-left: 1rem;
+    display: none;
+    background-color: #f0f9ff;
+}
+
+.sidebar-submenu li a {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: #1e40af;
+    font-size: 0.875rem;
+    text-decoration: none;
+}
+
+.sidebar-submenu li a:hover {
+    background-color: #dbeafe;
+    border-radius: 4px;
+}
+
+/* Toggle dropdown */
+.sidebar-item.active .sidebar-submenu {
+    display: block;
+}
