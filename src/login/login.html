@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embraer - Controle</title>
+    <link rel="stylesheet" href="styles_login.css">
+</head>
+<body>
+    <!-- Vídeo de fundo -->
+    <div class="video-background">
+        <video 
+            id="bgVideo"
+            autoplay 
+            muted 
+            loop 
+            playsinline 
+            preload="metadata"
+        >
+            <source src="assets/teste-fundo.mp4" type="video/mp4">
+            Seu navegador não suporta vídeo HTML5.
+        </video>
+    </div>
+
+    <!-- Camada escura sobre o vídeo -->
+    <div class="dark-overlay"></div>
+
+    <!-- Login Background -->
+    <div class="login-background">
+        <!-- Animated Radar Circles -->
+        <div class="radar-circles">
+            <div class="radar-circle radar-circle-1"></div>
+            <div class="radar-circle radar-circle-2"></div>
+            <div class="radar-circle radar-circle-3"></div>
+        </div>
+        
+        <!-- Flying Dots -->
+        <div class="flying-dots">
+            <div class="flying-dot flying-dot-1"></div>
+            <div class="flying-dot flying-dot-2"></div>
+            <div class="flying-dot flying-dot-3"></div>
+            <div class="flying-dot flying-dot-4"></div>
+            <div class="flying-dot flying-dot-5"></div>
+        </div>
+        
+        <!-- Grid Pattern -->
+        <div class="grid-pattern"></div>
+    </div>
+
+    <!-- Flight Info -->
+    <div class="flight-info">
+        <div class="flight-info-card">
+            <h3>Status</h3>
+            
+            <div class="flight-info-items">
+                <div class="flight-info-item">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12,6 12,12 16,14"/>
+                    </svg>
+                    <span id="utc-time">UTC: 00:00</span>
+                </div>
+            
+                <div class="flight-info-item">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    <span id="city-name">São José dos Campos</span>
+                </div>
+            
+                <div class="flight-info-item">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>
+                    </svg>
+                    <span id="temperature">--°C</span>
+                </div>
+            </div>
+            
+            <div class="flight-status">
+                <span class="status-label">Status:</span>
+                <span class="status-value">Ready for Takeoff</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="login-container">
+            <!-- substitua apenas esta parte da sua página -->
+            <div class="embraer-logo" style="text-align:center; margin-top:8px; margin-left: -40px;">
+                <div class="logo-icon-container" style="display:inline-block;">
+                    <div class="logo-icon no-bg">
+                        <img 
+                            src="assets/embraer-logo.svg" 
+                            alt="Embraer" 
+                            class="embraer-main-logo"
+                            style="width:220px; display:block; margin:0 auto;"
+                        >
+                    </div>
+                    <div class="logo-glow" aria-hidden="true"></div>
+                </div>
+            
+                <div class="logo-text" style="text-align:center; margin-top:8px; margin-right: -40px;">
+                    <p style="font-size:14px; font-weight:600; letter-spacing:2px; margin:0;">MRO BRASIL</p>
+                </div>
+            </div>
+
+            <!-- Login Form -->
+            <div class="login-form-container">
+                <div class="login-form-card">
+                    <div class="glassmorphism-effect"></div>
+                    <div class="animated-border"></div>
+                    
+                    <div class="form-content">
+                        <div class="form-header">
+                            <h2>Faça o seu Login</h2>
+                            <p>Insira suas credenciais para continuar</p>
+                        </div>
+
+                        <form id="loginForm" class="login-form">
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <div class="input-container">
+                                    <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                        <polyline points="22,6 12,13 2,6"/>
+                                    </svg>
+                                    <input 
+                                        type="email" 
+                                        id="email" 
+                                        placeholder="usuario@embraer.com.br" 
+                                        required
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="password">Senha</label>
+                                <div class="input-container">
+                                    <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                    </svg>
+                                    <input 
+                                        type="password" 
+                                        id="password" 
+                                        placeholder="••••••••" 
+                                        required
+                                    >
+                                    <button type="button" class="password-toggle" id="passwordToggle">
+                                        <svg class="eye-icon" id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                            <circle cx="12" cy="12" r="3"/>
+                                        </svg>
+                                        <svg class="eye-off-icon hidden" id="eyeOffIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                                            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                                            <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
+                                            <line x1="1" y1="1" x2="23" y2="23"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-options">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="remember">
+                                    <span class="checkmark"></span>
+                                    Lembrar-me
+                                </label>
+                                <a href="#" class="forgot-password">Esqueceu a senha?</a>
+                            </div>
+
+                            <button type="submit" class="login-button" id="loginButton">
+                                <div class="button-content" id="buttonContent">
+                                    <span>Entrar</span>
+                                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="5" y1="12" x2="19" y2="12"/>
+                                        <polyline points="12,5 19,12 12,19"/>
+                                    </svg>
+                                </div>
+                                <div class="loading-content hidden" id="loadingContent">
+                                    <div class="spinner"></div>
+                                    <span>Authenticating...</span>
+                                </div>
+                                <div class="button-glow"></div>
+                            </button>
+                        </form>
+
+                        <div class="form-footer">
+                            <p>
+                                Precisa de acesso? Entre em contato com seu 
+                                <a href="#">Gerente</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js?v=2"></script>
+</body>
+</html>

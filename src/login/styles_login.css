@@ -1,0 +1,880 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.5;
+    color: white;
+    overflow: hidden;
+}
+
+/* Login Background */
+.login-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('https://images.unsplash.com/photo-1735081011321-05742b1f046f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhaXJjcmFmdCUyMGNvY2twaXQlMjBtb2Rlcm4lMjBhdmlhdGlvbnxlbnwxfHx8fDE3NTk3NTQwNjZ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.dark-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+/* Animated Radar Circles */
+.radar-circles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.radar-circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 50%;
+    animation: radarPulse ease-in-out infinite;
+}
+
+.radar-circle-1 {
+    width: 200px;
+    height: 200px;
+    margin-left: -100px;
+    margin-top: -100px;
+    animation-duration: 4s;
+}
+
+.radar-circle-2 {
+    width: 400px;
+    height: 400px;
+    margin-left: -200px;
+    margin-top: -200px;
+    animation-duration: 5s;
+}
+
+.radar-circle-3 {
+    width: 600px;
+    height: 600px;
+    margin-left: -300px;
+    margin-top: -300px;
+    animation-duration: 6s;
+}
+
+@keyframes radarPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.1;
+    }
+}
+
+/* Flying Dots */
+.flying-dots {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.flying-dot {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgb(59, 130, 246);
+    border-radius: 50%;
+    animation: flyingDot ease-in-out infinite;
+}
+
+.flying-dot-1 {
+    left: 10%;
+    top: 20%;
+    animation-duration: 8s;
+    animation-delay: 0s;
+}
+
+.flying-dot-2 {
+    left: 80%;
+    top: 30%;
+    animation-duration: 10s;
+    animation-delay: 0.5s;
+}
+
+.flying-dot-3 {
+    left: 20%;
+    top: 70%;
+    animation-duration: 12s;
+    animation-delay: 1s;
+}
+
+.flying-dot-4 {
+    left: 70%;
+    top: 80%;
+    animation-duration: 9s;
+    animation-delay: 1.5s;
+}
+
+.flying-dot-5 {
+    left: 50%;
+    top: 10%;
+    animation-duration: 11s;
+    animation-delay: 2s;
+}
+
+@keyframes flyingDot {
+    0% {
+        transform: translate(0, 0);
+        opacity: 0;
+    }
+    25% {
+        transform: translate(100px, -100px);
+        opacity: 1;
+    }
+    50% {
+        transform: translate(-50px, 50px);
+        opacity: 0.5;
+    }
+    100% {
+        transform: translate(0, 0);
+        opacity: 0;
+    }
+}
+
+/* Grid Pattern */
+.grid-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.1;
+    background-image: 
+        linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+}
+
+/* Flight Info */
+.flight-info {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    z-index: 20;
+    animation: slideInRight 0.6s ease-out 0.8s both;
+}
+
+@media (max-width: 1024px) {
+    .flight-info {
+        display: none;
+    }
+}
+
+.flight-info-card {
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(16px);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.flight-info h3 {
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    color: rgb(147, 197, 253);
+}
+
+.flight-info-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+}
+
+.flight-info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.flight-info-item .icon {
+    width: 0.75rem;
+    height: 0.75rem;
+    color: rgb(96, 165, 250);
+}
+
+.flight-status {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+}
+
+.status-label {
+    color: rgb(147, 197, 253);
+}
+
+.status-value {
+    color: rgb(74, 222, 128);
+}
+
+/* Main Content */
+.main-content {
+    position: relative;
+    z-index: 10;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 28rem;
+}
+
+/* Embraer Logo */
+/* força a logo acima do texto e centraliza */
+/* Centraliza a logo exatamente acima do texto "MRO BRASIL" */
+.embraer-logo {
+    display: flex;
+    left: 48%;
+    position: center;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-bottom: 1.8rem; /* mantém o mesmo equilíbrio visual antes do form */
+}
+
+
+/* remove o círculo azul / fundo gradient que vinha de .logo-icon */
+.logo-icon.no-bg {
+    background: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0;
+    width: auto;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* esconde o "círculo azul" que estava em .logo-glow */
+.logo-glow {
+    display: none !important;
+}
+
+/* tamanho mais contido da logo (não maior do que antes) + animação suave */
+.embraer-main-logo {
+    width: 300px;      /* ajuste para não ficar grande demais */
+    height: auto;
+    left: 48%;
+    display: block;
+    align-items: center;
+    margin: 0 auto;
+    filter: brightness(1.05);
+    animation: plane-float 3s ease-in-out infinite; /* mantém movimento */
+    transition: transform 0.3s ease;
+}
+
+/* hover mantém leve escala/rotacao (se quiser manter o efeito antigo) */
+.logo-icon.no-bg:hover .embraer-main-logo {
+    transform: scale(1.03) rotate(3deg);
+}
+
+/* animação de flutuar */
+@keyframes plane-float {
+    0%, 100% { transform: translateY(0); }
+    50%     { transform: translateY(-4px); }
+}
+
+/* garante que o texto "MRO BRASIL" use a aparência original (tamanho / cor) */
+/* aumenta um pouco a logo */
+.embraer-main-logo {
+    display: block;
+    margin: 0 auto;
+    width: auto;
+    max-width: 300px;                     /* limite de largura, ajuste se necessário */
+    height: auto;
+    align-items: center;
+    transform: translateX(-12px); /* nudge padrão: -10px */
+}
+
+.embraer-main-logo:hover {
+    transform: scale(1.03);
+}
+
+/* diminui e centraliza o MRO BRASIL */
+.logo-text p {
+    margin-top: 6px; /* afasta um pouco da logo */
+    font-size: 0.9rem;        /* menor que antes */
+    color: rgb(191, 219, 254); /* mantém o azul original */
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.logo-icon-container {
+    position: relative;
+}
+
+.logo-icon {
+    width: 3rem;
+    height: 3rem;
+    background: linear-gradient(135deg, rgb(59, 130, 246), rgb(29, 78, 216));
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.embraer-small-logo {
+    width: 160px; /* ajuste fino do tamanho da logo */
+    height: auto;
+    display: block;
+    filter: brightness(1.1);
+    animation: plane-float 3s ease-in-out infinite; /* mantém a mesma animação do avião */
+}
+
+/* Reutiliza a animação existente */
+@keyframes plane-float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-4px);
+    }
+}
+
+/* Ajusta o texto “MRO BRASIL” */
+.logo-text .logo-subtitle {
+    margin-top: 6px;
+    font-size: 1rem;
+    letter-spacing: 2px;
+    color: #fff;
+    text-align: center;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.logo-icon:hover {
+    transform: scale(1.05) rotate(5deg);
+}
+
+.plane-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: white;
+}
+
+.logo-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(59, 130, 246, 0.3);
+    border-radius: 0.75rem;
+    filter: blur(16px);
+    z-index: -1;
+}
+
+.logo-text h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+.logo-text p {
+    font-size: 0.875rem;
+    color: rgb(191, 219, 254);
+    margin: 0;
+}
+
+/* Login Form */
+.login-form-container {
+    width: 100%;
+    max-width: 28rem;
+    animation: scaleInUp 0.6s ease-out 0.4s both;
+}
+
+.login-form-card {
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(32px);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.5rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.glassmorphism-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+}
+
+.animated-border {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 0.5rem;
+    background: linear-gradient(45deg, transparent 30%, rgba(59, 130, 246, 0.3) 50%, transparent 70%);
+    background-size: 200% 200%;
+    animation: borderAnimation 3s linear infinite;
+}
+
+@keyframes borderAnimation {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 100%; }
+}
+
+.form-content {
+    position: relative;
+    padding: 2rem;
+    animation: fadeIn 0.6s ease-out 0.6s both;
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.form-header h2 {
+    font-size: 1.25rem;
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+.form-header p {
+    color: rgb(191, 219, 254);
+}
+
+/* Form Styles */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    color: white;
+    font-weight: 500;
+}
+
+.input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.input-container:hover .input-hover-effect {
+    opacity: 1;
+}
+
+.input-icon {
+    position: absolute;
+    left: 0.75rem;
+    width: 1rem;
+    height: 1rem;
+    color: rgb(147, 197, 253);
+    z-index: 2;
+}
+
+.input-container input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 0.375rem;
+    color: white;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.input-container input::placeholder {
+    color: rgb(191, 219, 254);
+}
+
+.input-container input:focus {
+    outline: none;
+    border-color: rgb(96, 165, 250);
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3);
+}
+
+.input-hover-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.2), transparent);
+    border-radius: 0.375rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    color: rgb(147, 197, 253);
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.3s ease;
+    z-index: 2;
+}
+
+.password-toggle:hover {
+    color: white;
+}
+
+.password-toggle svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Form Options */
+.form-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.875rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    color: rgb(191, 219, 254);
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    margin-right: 0.5rem;
+    width: 1rem;
+    height: 1rem;
+}
+
+.forgot-password {
+    color: rgb(147, 197, 253);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.forgot-password:hover {
+    color: white;
+}
+
+/* Login Button */
+.login-button {
+    position: relative;
+    width: 100%;
+    height: 3rem;
+    background: linear-gradient(90deg, rgb(37, 99, 235), rgb(29, 78, 216));
+    border: none;
+    border-radius: 0.375rem;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
+}
+
+.login-button:hover {
+    background: linear-gradient(90deg, rgb(29, 78, 216), rgb(30, 64, 175));
+    transform: scale(1.02);
+}
+
+.login-button:active {
+    transform: scale(0.98);
+}
+
+.button-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 100%;
+}
+
+.loading-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 100%;
+    animation: pulse 1s ease-in-out infinite;
+}
+
+.arrow-icon {
+    width: 1rem;
+    height: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.login-button:hover .arrow-icon {
+    transform: translateX(0.25rem);
+}
+
+.spinner {
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.button-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, rgba(96, 165, 250, 0.2), rgba(59, 130, 246, 0.2));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.login-button:hover .button-glow {
+    opacity: 1;
+}
+
+/* Form Footer */
+.form-footer {
+    text-align: center;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    margin-top: 1rem;
+}
+
+.form-footer p {
+    color: rgb(191, 219, 254);
+    font-size: 0.875rem;
+}
+
+.form-footer a {
+    color: rgb(147, 197, 253);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.form-footer a:hover {
+    color: white;
+}
+
+/* Animations */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scaleInUp {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main-content {
+        padding: 0.5rem;
+    }
+    
+    .login-container {
+        max-width: 100%;
+    }
+    
+    .form-content {
+        padding: 1.5rem;
+    }
+    
+    .embraer-logo {
+        margin-bottom: 1.5rem;
+    }
+    
+    .logo-text h1 {
+        font-size: 1.25rem;
+    }
+}
+
+/* === Fundo com vídeo responsivo otimizado (PC e mobile) === */
+.video-background {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    z-index: -2;
+    background: black;
+    will-change: transform;
+}
+
+/* --- Ajuste do vídeo --- */
+.video-background video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    object-position: center center;
+    background-color: black;
+    display: block;
+    pointer-events: none;
+    transition: none;
+    image-rendering: auto;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+}
+
+/* --- Camada escura sobre o vídeo --- */
+.dark-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.25);
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* --- Ajuste para mobile --- */
+@media (max-width: 1024px) {
+    html, body {
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .video-background {
+        height: 100%;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: black;
+    }
+
+    .video-background video {
+        object-fit: cover;
+        width: 100vw;
+        height: 100vh;
+        transform: none;
+        top: 0;
+        left: 0;
+        min-width: 100%;
+        min-height: 100%;
+    }
+}
+
+/* --- Otimizações extras --- */
+#bgVideo {
+    preload: metadata;
+    playsinline: true;
+    autoplay: true;
+    muted: true;
+    loop: true;
+}
