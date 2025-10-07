@@ -817,3 +817,22 @@ body.sidebar-open {
   opacity: 1;
   transform: scale(1.1);
 }
+
+/* ===== Ajuste do botão Anotar Registro no mobile ===== */
+@media (max-width: 768px) {
+    #add-item-btn {
+        padding: 0.4rem 0.8rem;   /* reduz um pouco o tamanho */
+        font-size: 0.75rem;       /* texto menor */
+    }
+
+    #add-item-btn i {
+        font-size: 0.8rem;        /* ícone proporcionalmente menor */
+    }
+}
+
+@media (max-width: 480px) {
+    #add-item-btn {
+        padding: 0.35rem 0.7rem;  /* ainda mais compacto em telas muito pequenas */
+        font-size: 0.7rem;
+    }
+}
