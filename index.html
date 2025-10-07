@@ -30,20 +30,18 @@
                     Anotar Registro
                 </button>
 
-               <!-- Botão azul (hamburger) -->
-<input type="checkbox" id="sidebar-checkbox" hidden>
+               <!-- Botão azul do menu -->
+<button id="sidebar-toggle" class="sidebar-toggle">
+  <i class="fa-solid fa-bars"></i>
+</button>
 
-<label for="sidebar-checkbox" class="sidebar-toggle" aria-label="Abrir menu">
-  <span class="hamburger">&#9776;</span>
-</label>
-
-<!-- Sidebar já existente (não tocar no conteúdo abaixo da sidebar-menu) -->
+<!-- Sidebar já existente -->
 <aside class="sidebar">
   <!-- Botão X dentro da sidebar -->
-  <label for="sidebar-checkbox" class="close-btn" aria-label="Fechar menu">✕</label>
+  <button id="close-sidebar" class="close-btn">✕</button>
 
   <ul class="sidebar-menu">
-    <!-- Aqui fica todo o conteúdo original da sidebar -->
+    <!-- TODO o conteúdo da sua sidebar continua igual -->
   </ul>
 </aside>
         <!-- Rota -->
