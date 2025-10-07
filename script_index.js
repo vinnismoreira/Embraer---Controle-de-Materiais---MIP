@@ -9,18 +9,40 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // SISTEMA DE GESTÃO DE ESTOQUE
 // ==========================
 class StockManager {
-    constructor() {
-        this.stockItems = JSON.parse(localStorage.getItem('stockItems')) || [];
-        this.currentFilter = 'ALL';
-        this.currentSearch = '';
-        this.editingItemId = null;
-        this.init();
+
+    async loadFromDatabase() {
+    try {
+        const { data, error } = await supabase
+            .from("GESTAO_DE_ESTOQUE")
+            .select("*")
+            .order("id", { ascending: false });
+
+        if (error) {
+            console.error("❌ Erro ao carregar dados do Supabase:", error.message);
+            alert("Erro ao carregar dados do banco: " + error.message);
+            return;
+        }
+
+        this.stockItems = data || [];
+        this.renderTable();
+        this.updateItemsCount();
+    } catch (err) {
+        console.error("❌ Erro inesperado ao carregar dados:", err);
+        alert("Erro inesperado ao carregar dados do banco.");
     }
+}
+
+    constructor() {
+    this.stockItems = [];
+    this.currentFilter = 'ALL';
+    this.currentSearch = '';
+    this.editingItemId = null;
+    this.init();
+}
 
     init() {
         this.bindEvents();
-        this.renderTable();
-        this.updateItemsCount();
+        this.loadFromDatabase();
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('verification-date').value = today;
     }
@@ -143,7 +165,7 @@ class StockManager {
                 verifiedDate: new Date(formData.verificationDate).toLocaleDateString('pt-BR'),
             });
 
-            localStorage.setItem('stockItems', JSON.stringify(this.stockItems));
+            await this.loadFromDatabase();
             this.renderTable();
             this.updateItemsCount();
             this.closeModal();
@@ -155,14 +177,25 @@ class StockManager {
         }
     }
 
-    deleteItem(itemId) {
-        if (!confirm('Deseja realmente remover este item?')) return;
-        this.stockItems = this.stockItems.filter(i => i.id !== itemId);
-        localStorage.setItem('stockItems', JSON.stringify(this.stockItems));
-        supabase.from("GESTAO_DE_ESTOQUE").delete().eq("id", itemId);
-        this.renderTable();
-        this.updateItemsCount();
+    async deleteItem(itemId) {
+    if (!confirm('Deseja realmente remover este item?')) return;
+
+    try {
+        const { error } = await supabase
+            .from("GESTAO_DE_ESTOQUE")
+            .delete()
+            .eq("id", itemId);
+
+        if (error) throw error;
+
+        alert("🗑️ Item removido com sucesso!");
+        await this.loadFromDatabase();
+    } catch (err) {
+        console.error("❌ Erro ao excluir item:", err);
+        alert("Erro ao excluir o item do banco.");
     }
+}
+
 
     getFilteredItems() {
         let filtered = this.stockItems;
