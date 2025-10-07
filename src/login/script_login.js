@@ -63,7 +63,7 @@ function setupPasswordToggle() {
     });
 }
 
-// Form submission with loading state
+// Setup login apenas com domínios permitidos
 function setupFormSubmission() {
     const loginForm = document.getElementById('loginForm');
     const loginButton = document.getElementById('loginButton');
@@ -72,51 +72,30 @@ function setupFormSubmission() {
     
     if (!loginForm || !loginButton || !buttonContent || !loadingContent) return;
     
-    loginForm.addEventListener('submit', async function(e) {
+    loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
         loginButton.disabled = true;
         buttonContent.classList.add('hidden');
         loadingContent.classList.remove('hidden');
 
-        try {
-            const email = document.getElementById('email').value.trim().toLowerCase();
-            const password = document.getElementById('password').value.trim();
+        const email = document.getElementById('email').value.trim().toLowerCase();
+        const allowedDomains = ['@embraer.com.br', '@globmail.com.br'];
+        const isAllowed = allowedDomains.some(domain => email.endsWith(domain));
 
-            // Domínios permitidos
-            const allowedDomains = ['@embraer.com.br', '@globmail.com.br'];
-            const isAllowed = allowedDomains.some(domain => email.endsWith(domain));
-
-            if (!isAllowed) throw new Error('Apenas e-mails corporativos autorizados.');
-
-            // Autenticação real no Supabase
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-            if (error) throw error;
-
-            console.log('Usuário logado:', data.user);
-            showSuccessMessage();
-
-            setTimeout(() => {
-                window.location.href = '/index.html'; // rota interna
-            }, 1000);
-
-        } catch (error) {
-            console.error('Falha na autenticação:', error);
-            showErrorMessage(error.message);
-        } finally {
-            loginButton.disabled = false;
-            buttonContent.classList.remove('hidden');
-            loadingContent.classList.add('hidden');
-        }
+        setTimeout(() => { // simula carregamento
+            if (isAllowed) {
+                window.location.href = '/index.html'; // redireciona para a página principal
+            } else {
+                showErrorMessage('Apenas e-mails corporativos autorizados.');
+                loginButton.disabled = false;
+                buttonContent.classList.remove('hidden');
+                loadingContent.classList.add('hidden');
+            }
+        }, 500);
     });
 
-    function showSuccessMessage() {
-        const notification = createNotification('Autenticação realizada com sucesso!', 'success');
-        document.body.appendChild(notification);
-        setTimeout(() => notification.remove(), 3000);
-    }
-
-    function showErrorMessage(msg = 'Falha na autenticação. Verifique suas credenciais.') {
+    function showErrorMessage(msg) {
         const notification = createNotification(msg, 'error');
         document.body.appendChild(notification);
         setTimeout(() => notification.remove(), 3000);

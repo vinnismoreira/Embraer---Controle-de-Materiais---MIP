@@ -27,14 +27,12 @@
 
     <!-- Login Background -->
     <div class="login-background">
-        <!-- Animated Radar Circles -->
         <div class="radar-circles">
             <div class="radar-circle radar-circle-1"></div>
             <div class="radar-circle radar-circle-2"></div>
             <div class="radar-circle radar-circle-3"></div>
         </div>
         
-        <!-- Flying Dots -->
         <div class="flying-dots">
             <div class="flying-dot flying-dot-1"></div>
             <div class="flying-dot flying-dot-2"></div>
@@ -43,7 +41,6 @@
             <div class="flying-dot flying-dot-5"></div>
         </div>
         
-        <!-- Grid Pattern -->
         <div class="grid-pattern"></div>
     </div>
 
@@ -87,7 +84,6 @@
     <!-- Main Content -->
     <div class="main-content">
         <div class="login-container">
-            <!-- substitua apenas esta parte da sua página -->
             <div class="embraer-logo" style="text-align:center; margin-top:8px; margin-left: -40px;">
                 <div class="logo-icon-container" style="display:inline-block;">
                     <div class="logo-icon no-bg">
@@ -199,17 +195,61 @@
             </div>
         </div>
     </div>
-    
-<!-- SUPABASE SDK -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- Script Login -->
+<script src="script_login.js"></script>
 <script>
-  // Substitua pelos seus dados do Supabase
-  const SUPABASE_URL = 'https://mqjhjcdfgksdfxfzfdlk.supabase.co'
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xamhqY2RmZ2tzZGZ4ZnpmZGxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDQ0MjAsImV4cCI6MjA3NDk4MDQyMH0.Kbw_ai5CndZvJQ8SJEeVjPHIDsp-6flf941kIJpG6XY'
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.getElementById('loginForm');
+    const loginButton = document.getElementById('loginButton');
+    const buttonContent = document.getElementById('buttonContent');
+    const loadingContent = document.getElementById('loadingContent');
+
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        loginButton.disabled = true;
+        buttonContent.classList.add('hidden');
+        loadingContent.classList.remove('hidden');
+
+        const email = document.getElementById('email').value.trim().toLowerCase();
+        const allowedDomains = ['@embraer.com.br', '@globmail.com.br'];
+        const isAllowed = allowedDomains.some(domain => email.endsWith(domain));
+
+        setTimeout(() => {
+            if (isAllowed) {
+                window.location.href = '/index.html';
+            } else {
+                showErrorMessage('Apenas e-mails corporativos autorizados.');
+                loginButton.disabled = false;
+                buttonContent.classList.remove('hidden');
+                loadingContent.classList.add('hidden');
+            }
+        }, 500);
+    });
+
+    function showErrorMessage(msg) {
+        const notification = document.createElement('div');
+        notification.className = 'notification notification-error';
+        notification.textContent = msg;
+        notification.style.cssText = `
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            animation: slideInRight 0.3s ease-out;
+            max-width: 300px;
+            background: linear-gradient(135deg, rgb(239, 68, 68), rgb(220, 38, 38));
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
+    }
+});
 </script>
-    <script src="script_login.js"></script>
-    
 
 </body>
 </html>
