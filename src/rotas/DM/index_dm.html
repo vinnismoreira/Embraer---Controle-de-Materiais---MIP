@@ -228,6 +228,38 @@
             <div class="modal-body">
                 <p class="modal-description" id="modal-description">Adicione um novo registro ao estoque preenchendo as informações abaixo.</p>
                 <form id="item-form">
+                    <!-- Informações Básicas -->
+                    <div class="form-section">
+                        <h4>Informações Básicas</h4>
+                        <div class="form-grid">
+                            <!-- Nome do Material -->
+                            <div class="form-group">
+                                <label for="material-name">PN</label>
+                                <select id="material-name" class="form-control" required>
+                                    <option value="">Selecione um PN</option>
+                                    <!-- opções serão preenchidas via JavaScript -->
+                                </select>
+                            </div>
+                
+                            <!-- ECODE -->
+                            <div class="form-group">
+                                <label for="material-id">ECODE</label>
+                                <select id="material-id" class="form-control" required>
+                                    <option value="">Selecione o ECODE</option>
+                                    <!-- opções serão preenchidas via JavaScript -->
+                                </select>
+                            </div>
+                
+                            <!-- Descrição -->
+                            <div class="form-group">
+                                <label for="material-desc">Descrição</label>
+                                <select id="material-desc" class="form-control" required>
+                                    <option value="">Selecione a descrição</option>
+                                    <!-- opções serão preenchidas via JavaScript -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 
                      <!-- Informações Complementares -->
                     <form id="item-form">
