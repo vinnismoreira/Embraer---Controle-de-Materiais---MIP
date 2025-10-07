@@ -4,12 +4,110 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Embraer - Controle de Estoque MIP</title>
+<<<<<<< HEAD
+
+    <!-- CSS externo -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Ícone -->
+    <link rel="icon" type="image/png" href="embraer-aviao.png">
+
+    <!-- Sidebar CSS (adicione também no seu styles.css se quiser manter separado) -->
+    <style>
+        /* === SIDEBAR FIXA === */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #0b1b2b; /* Azul Embraer escuro */
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 15px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .sidebar .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 40px;
+        }
+
+        .sidebar .logo img {
+            height: 40px;
+        }
+
+        .sidebar .logo h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .sidebar nav {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .sidebar nav a {
+            color: #dcdcdc;
+            text-decoration: none;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar nav a:hover,
+        .sidebar nav a.active {
+            background-color: #1e3a5f;
+            color: #fff;
+        }
+
+        /* === Ajuste no corpo do site === */
+        body {
+            display: flex;
+            margin: 0;
+        }
+
+        .container,
+        header.header,
+        #toast-container,
+        .modal {
+            margin-left: 240px; /* desloca o conteúdo pra direita */
+        }
+    </style>
+=======
     <link rel="stylesheet" href="styles_index.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="assets/embraer-aviao.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+>>>>>>> 3abf5dd5665a56bf2b87ea8d208b22b387eaf88e
 </head>
+
 <body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <img src="embraer-logo.svg" alt="Logo Embraer">
+            <h2>Estoque MIP</h2>
+        </div>
+        <nav>
+            <a href="#" class="active"><i class="fas fa-warehouse"></i> Estoque</a>
+            <a href="#"><i class="fas fa-plus"></i> Anotar Registro</a>
+            <a href="#"><i class="fas fa-filter"></i> Filtros</a>
+            <a href="#"><i class="fas fa-cog"></i> Configurações</a>
+            <a href="#"><i class="fas fa-sign-out-alt"></i> Sair</a>
+        </nav>
+    </aside>
+
     <!-- Toast Container -->
     <div id="toast-container" class="toast-container"></div>
 
@@ -19,8 +117,12 @@
             <!-- Embraer Logo -->
             <div class="embraer-logo">
                 <div class="logo-icon">
+<<<<<<< HEAD
+                    <img src="embraer-logo.svg" alt="Logo Embraer" style="height:50px;">
+=======
                     <!-- ajuste o caminho da imagem conforme seu ambiente -->
                     <img src="assets/embraer-logo.svg" alt="Logo Embraer" style="height:50px;">
+>>>>>>> 3abf5dd5665a56bf2b87ea8d208b22b387eaf88e
                 </div>
                 <div class="logo-text"></div>
             </div>
@@ -31,11 +133,14 @@
                     Anotar Registro
                 </button>
 
-   !-- Botão do menu (abre/fecha sidebar) -->
+                <!-- Botão para abrir/fechar sidebar -->
 <button class="sidebar-toggle" id="sidebar-toggle">
-  <i class="fa-solid fa-bars" id="menu-icon"></i>
-  <i class="fa-solid fa-xmark" id="close-icon"></i>
+  <i class="fa-solid fa-bars"></i>
 </button>
+            </div>
+        </div>
+    </header>
+
 
     <!-- Sidebar -->
 <aside class="sidebar">
@@ -143,7 +248,7 @@
                             <th>Quantidade</th>
                             <th>Verificado por</th>
                             <th>Status</th>
-                            <th>Motivo de Descarte</th> <!-- NOVO -->
+                            <th>Motivo de Descarte</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -178,36 +283,32 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p class="modal-description" id="modal-description">Adicione um novo registro ao estoque preenchendo as informações abaixo.</p>
+                <p class="modal-description" id="modal-description">
+                    Adicione um novo registro ao estoque preenchendo as informações abaixo.
+                </p>
                 <form id="item-form">
                     <!-- Informações Básicas -->
                     <div class="form-section">
                         <h4>Informações Básicas</h4>
                         <div class="form-grid">
-                            <!-- Nome do Material -->
                             <div class="form-group">
                                 <label for="material-name">PN</label>
                                 <select id="material-name" class="form-control" required>
                                     <option value="">Selecione um PN</option>
-                                    <!-- opções serão preenchidas via JavaScript -->
                                 </select>
                             </div>
                 
-                            <!-- ECODE -->
                             <div class="form-group">
                                 <label for="material-id">ECODE</label>
                                 <select id="material-id" class="form-control" required>
                                     <option value="">Selecione o ECODE</option>
-                                    <!-- opções serão preenchidas via JavaScript -->
                                 </select>
                             </div>
                 
-                            <!-- Descrição -->
                             <div class="form-group">
                                 <label for="material-desc">Descrição</label>
                                 <select id="material-desc" class="form-control" required>
                                     <option value="">Selecione a descrição</option>
-                                    <!-- opções serão preenchidas via JavaScript -->
                                 </select>
                             </div>
                         </div>
@@ -217,7 +318,6 @@
                     <div class="form-section">
                         <h4>Informações Complementares</h4>
                         <div class="form-grid">
-                            <!-- Localização no Estoque -->
                             <div class="form-group">
                                 <label for="location">Localização no Estoque</label>
                                 <select id="location" class="form-control" required>
@@ -230,7 +330,6 @@
                                 </select>
                             </div>
                 
-                            <!-- Motivo de Descarte -->
                             <div class="form-group">
                                 <label for="discard-reason">Motivo de Descarte</label>
                                 <select id="discard-reason">
@@ -241,20 +340,17 @@
                                 </select>
                             </div>
                 
-                            <!-- Data de Verificação -->
                             <div class="form-group">
                                 <label for="verification-date">Data de Verificação</label>
                                 <input type="date" id="verification-date" required>
                             </div>
                 
-                            <!-- Data de Validade -->
                             <div class="form-group">
                                 <label for="expiry-date">Data de Validade</label>
                                 <input type="date" id="expiry-date">
                             </div>
                         </div>
                 
-                        <!-- Responsável pelo Cadastro -->
                         <div class="form-group form-group-full">
                             <label for="responsible">Responsável pelo Registro</label>
                             <select id="responsible" class="form-control" required>
@@ -287,7 +383,6 @@
                     <i class="fas fa-undo"></i>
                     Limpar
                 </button>
-                <!-- importante: type="button" para não submeter o form -->
                 <button type="button" class="btn btn-primary" id="save-item-btn">
                     <i class="fas fa-save"></i>
                     Salvar
@@ -296,7 +391,11 @@
         </div>
     </div>
 
+<<<<<<< HEAD
+    <script type="module" src="script.js"></script>
+=======
     <script type="module" src="script_index.js"></script>
 
+>>>>>>> 3abf5dd5665a56bf2b87ea8d208b22b387eaf88e
 </body>
 </html>
