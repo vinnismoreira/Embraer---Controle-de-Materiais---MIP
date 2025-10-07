@@ -745,33 +745,50 @@ textarea {
   background: #12244f;
 }
 
-/* ===== Sidebar padrão ===== */
-.sidebar {
+/* ===== NOVO BOTÃO DE MENU (GLASS AZUL EMBRAER) ===== */
+.sidebar-toggle {
   position: fixed;
-  left: 0;
-  top: 0;
-  width: 240px;
-  height: 100vh;
-  background: #ffffff;
-  color: white;
-  padding: 20px;
-  box-shadow: 2px 0 6px rgba(0,0,0,0.3);
-  transition: transform 0.3s ease;
+  top: 15px;
+  left: 15px;
+  z-index: 2001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 45px;
+  background: rgba(18, 69, 179, 0.4); /* azul translúcido */
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-/* Sidebar recolhida */
-.sidebar.closed {
-  transform: translateX(-100%);
+.sidebar-toggle:hover {
+  background: rgba(18, 69, 179, 0.6);
+  transform: scale(1.05);
 }
 
-/* Ajusta o conteúdo conforme a sidebar */
-.main-content {
-  margin-top: 60px; /* espaço do header */
-  margin-left: 240px; /* espaço da sidebar */
-  padding: 30px;
-  transition: margin 0.3s ease;
+.sidebar-toggle i {
+  color: #ffffff;
+  font-size: 20px;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  position: absolute;
 }
 
-.sidebar.closed ~ .main-content {
-  margin-left: 0;
+/* Ícone "X" começa invisível */
+#close-icon {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+/* Quando o menu estiver aberto */
+.sidebar.open ~ .sidebar-toggle #menu-icon {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.sidebar.open ~ .sidebar-toggle #close-icon {
+  opacity: 1;
+  transform: scale(1);
 }

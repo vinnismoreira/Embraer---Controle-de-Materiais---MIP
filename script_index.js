@@ -346,25 +346,24 @@ document.querySelectorAll('.sidebar-item > .sidebar-link').forEach(link => {
   });
 });
 
-// === Sidebar ===
-const sidebar = document.querySelector(".sidebar");
-const toggleBtn = document.getElementById("sidebar-toggle");
-const toggleIcon = toggleBtn.querySelector("i");
+const sidebar = document.querySelector('.sidebar');
+  const toggleBtn = document.querySelector('#sidebar-toggle');
+  const menuIcon = document.querySelector('#menu-icon');
+  const closeIcon = document.querySelector('#close-icon');
 
-// Alterna abrir/fechar a sidebar
-toggleBtn.addEventListener("click", (e) => {
-  e.stopPropagation();
-  sidebar.classList.toggle("closed");
+  toggleBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+    const isOpen = sidebar.classList.contains('open');
 
-  if (sidebar.classList.contains("closed")) {
-    toggleIcon.classList.remove("fa-xmark");
-    toggleIcon.classList.add("fa-bars");
-  } else {
-    toggleIcon.classList.remove("fa-bars");
-    toggleIcon.classList.add("fa-xmark");
-  }
-});
-
+    // Alterna ícones
+    if (isOpen) {
+      menuIcon.style.opacity = '0';
+      closeIcon.style.opacity = '1';
+    } else {
+      menuIcon.style.opacity = '1';
+      closeIcon.style.opacity = '0';
+    }
+  })
 // Fecha ao clicar fora da sidebar
 document.addEventListener("click", (e) => {
   const clickedOutsideSidebar = !sidebar.contains(e.target) && !toggleBtn.contains(e.target);
