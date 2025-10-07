@@ -370,3 +370,14 @@ if (menuToggle && sidebar) {
     }
   });
 }
+
+// Seleciona o X dentro da sidebar
+const closeSidebar = document.querySelector('.sidebar .close-sidebar');
+
+if (closeSidebar && sidebar) {
+  closeSidebar.addEventListener('click', (e) => {
+    e.stopPropagation();
+    sidebar.classList.remove('active');
+    document.body.classList.remove('sidebar-open');
+  });
+}
