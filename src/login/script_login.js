@@ -125,9 +125,20 @@ function setupFormSubmission() {
 }
 
 async function simulateAuthentication() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
 
+    // Domínios permitidos
+    const allowedDomains = ["embraer.com.br", "globmail.com.br"];
+
+    // Extrai domínio do e-mail
+    const domain = email.split("@")[1];
+
+    if (!allowedDomains.includes(domain)) {
+        throw new Error("Apenas emails corporativos são permitidos.");
+    }
+
+    // Login real com Supabase
     const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
@@ -136,6 +147,10 @@ async function simulateAuthentication() {
     if (error) {
         throw new Error(error.message);
     }
+
+    // Redireciona após sucesso
+    window.location.href = "/index.html";
+}
 
     // Se deu certo, pode redirecionar para o painel principal:
     window.location.href = "/src/home/index.html";
