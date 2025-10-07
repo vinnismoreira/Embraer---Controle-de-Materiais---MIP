@@ -776,7 +776,7 @@ textarea {
   margin-left: 0;
 }
 
-/* ===== BOTÃO DE FECHAR (X) ===== */
+/* ===== BOTÃO DE FECHAR (X) DENTRO DA SIDEBAR ===== */
 .close-sidebar {
   position: absolute;
   top: 15px;
@@ -784,7 +784,7 @@ textarea {
   background: none;
   border: none;
   color: #1245b3;
-  font-size: 24px;
+  font-size: 26px;
   cursor: pointer;
   display: none; /* escondido por padrão */
   z-index: 2001;
@@ -795,13 +795,13 @@ textarea {
   color: #0b2d73;
 }
 
-/* Quando a sidebar estiver aberta, o X aparece */
+/* Mostra o X quando a sidebar estiver aberta */
 .sidebar.open .close-sidebar {
   display: block;
 }
 
-/* Quando a sidebar estiver aberta, o botão azul some */
-.sidebar.open ~ .sidebar-toggle {
+/* Esconde o botão azul quando o menu abre */
+.sidebar.open ~ #sidebar-toggle {
   opacity: 0;
   pointer-events: none;
 }

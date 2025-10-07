@@ -374,3 +374,18 @@ document.addEventListener("click", (e) => {
     toggleIcon.classList.add("fa-bars");
   }
 });
+
+// === Botão X dentro da sidebar ===
+const closeSidebarBtn = document.createElement("button");
+closeSidebarBtn.classList.add("close-sidebar");
+closeSidebarBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+sidebar.appendChild(closeSidebarBtn);
+
+// Mostra/esconde o botão azul (já controlado pelo CSS)
+toggleBtn.addEventListener("click", () => {
+  sidebar.classList.add("open");
+});
+
+closeSidebarBtn.addEventListener("click", () => {
+  sidebar.classList.remove("open");
+});
