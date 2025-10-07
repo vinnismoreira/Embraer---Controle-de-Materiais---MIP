@@ -725,26 +725,6 @@ textarea {
     display: block;
 }
 
-/* ===== Botão de abrir/fechar sidebar ===== */
-.sidebar-toggle {
-  position: fixed;
-  top: 15px;
-  left: 15px;
-  z-index: 1001;
-  background: #1245b3;
-  color: #fff;
-  border: none;
-  padding: 10px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 18px;
-  transition: background 0.3s ease;
-}
-
-.sidebar-toggle:hover {
-  background: #12244f;
-}
-
 /* ===== Sidebar padrão ===== */
 .sidebar {
   position: fixed;
@@ -759,11 +739,6 @@ textarea {
   transition: transform 0.3s ease;
 }
 
-/* Sidebar recolhida */
-.sidebar.closed {
-  transform: translateX(-100%);
-}
-
 /* Ajusta o conteúdo conforme a sidebar */
 .main-content {
   margin-top: 60px; /* espaço do header */
@@ -774,34 +749,4 @@ textarea {
 
 .sidebar.closed ~ .main-content {
   margin-left: 0;
-}
-
-/* ===== BOTÃO DE FECHAR (X) DENTRO DA SIDEBAR ===== */
-.close-sidebar {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  background: none;
-  border: none;
-  color: #1245b3;
-  font-size: 26px;
-  cursor: pointer;
-  display: none; /* escondido por padrão */
-  z-index: 2001;
-  transition: color 0.2s ease;
-}
-
-.close-sidebar:hover {
-  color: #0b2d73;
-}
-
-/* Mostra o X quando a sidebar estiver aberta */
-.sidebar.open .close-sidebar {
-  display: block;
-}
-
-/* Esconde o botão azul quando o menu abre */
-.sidebar.open ~ #sidebar-toggle {
-  opacity: 0;
-  pointer-events: none;
 }
