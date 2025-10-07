@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Embraer - Controle de Estoque MIP</title>
-    <link rel="stylesheet" href="styles_index.css">
+    <link rel="stylesheet" href="styles_reparo.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="assets/embraer-aviao.png">
 </head>
@@ -125,6 +125,28 @@
 
 
     <div class="container">
+        <!-- Estatísticas de Registros -->
+<div class="stats-cards">
+    <div class="stat-card registered">
+        <div class="stat-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-info">
+            <h4>Registrados</h4>
+            <p id="registered-count">45</p>
+        </div>
+    </div>
+
+    <div class="stat-card not-registered">
+        <div class="stat-icon">
+            <i class="fas fa-times-circle"></i>
+        </div>
+        <div class="stat-info">
+            <h4>Não Registrados</h4>
+            <p id="not-registered-count">3</p>
+        </div>
+    </div>
+</div>
         <!-- Filters -->
         <div class="card filters-card">
             <div class="card-header">
@@ -138,54 +160,61 @@
                             <input type="text" id="search-input" placeholder="Buscar...">
                         </div>
                     </div>
+                    
                     <div class="filter-group">
                         <select id="status-filter">
                             <option value="ALL">Todos os Status</option>
-                            <option value="OK">OK</option>
-                            <option value="EM FALTA">EM FALTA</option>
-                            <option value="VENCIDO">VENCIDO</option>
-                            <option value="EM DESCARTE">EM DESCARTE</option>
+                            <option value="Anexados">Anexados</option>
+                            <option value="Respostas">Respostas</option>
                         </select>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Table -->
-        <div class="card table-card">
-            <div class="table-container">
-                <table class="stock-table">
-                    <thead>
-                        <tr>
-                            <th>Nome do Produto</th>
-                            <th>ECODE</th>
-                            <th>Quantidade</th>
-                            <th>Verificado por</th>
-                            <th>Status</th>
-                            <th>Motivo de Descarte</th> <!-- NOVO -->
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="stock-table-body"></tbody>
-                </table>
-                <div id="no-items-message" class="no-items" style="display: none;">
-                    Nenhum item encontrado
-                </div>
-            </div>
-        </div>
+       <!-- Table -->
+<div class="card table-card">
+    <div class="table-container">
+        <table class="stock-table">
+            <thead>
+                <tr>
+                    <th style="width: 50%;">Nome</th>
+                    <th style="width: 25%; text-align: center;">Respostas</th>
+                    <th style="width: 25%; text-align: center;">Anexados</th>
+                </tr>
+            </thead>
+            <tbody id="stock-table-body">
+                <!-- Exemplo de linhas (pode remover se for preenchido via JS) -->
+                <tr>
+                    <td>Checklist Técnico</td>
+                    <td style="text-align: center;">12</td>
+                    <td style="text-align: center;">5</td>
+                </tr>
+                <tr>
+                    <td>Relatório de Voo</td>
+                    <td style="text-align: center;">8</td>
+                    <td style="text-align: center;">2</td>
+                </tr>
+            </tbody>
+        </table>
 
-        <!-- Pagination -->
-        <div class="pagination">
-            <div class="pagination-info">
-                <span id="items-count">Exibindo 0 de 0 itens</span>
-            </div>
-            <div class="pagination-controls">
-                <button class="btn btn-outline btn-sm">Anterior</button>
-                <button class="btn btn-outline btn-sm">1</button>
-                <button class="btn btn-outline btn-sm">Próximo</button>
-            </div>
+        <div id="no-items-message" class="no-items" style="display: none;">
+            Nenhum item encontrado
         </div>
     </div>
+</div>
+
+<!-- Pagination -->
+<div class="pagination">
+    <div class="pagination-info">
+        <span id="items-count">Exibindo 0 de 0 itens</span>
+    </div>
+    <div class="pagination-controls">
+        <button class="btn btn-outline btn-sm">Anterior</button>
+        <button class="btn btn-outline btn-sm">1</button>
+        <button class="btn btn-outline btn-sm">Próximo</button>
+    </div>
+</div>
 
     <!-- Add/Edit Item Modal -->
     <div id="item-modal" class="modal">
@@ -315,7 +344,7 @@
         </div>
     </div>
 
-    <script type="module" src="script_index.js"></script>
+    <script type="module" src="script_reparo.js"></script>
 
 </body>
 </html>
