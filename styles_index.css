@@ -797,3 +797,23 @@ textarea {
 body.sidebar-open {
   overflow: hidden;
 }
+
+/* === Botão de fechar da sidebar === */
+.close-sidebar {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: transparent;
+  border: none;
+  color: #1e40af; /* azul Embraer */
+  font-size: 1.2rem;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: all 0.2s ease;
+  z-index: 1001;
+}
+
+.close-sidebar:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
