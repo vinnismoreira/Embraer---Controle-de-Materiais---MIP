@@ -19,13 +19,14 @@
             <button id="menu-toggle" class="menu-toggle">
                 <i class="fas fa-bars"></i>
             </button>
-            <!-- Embraer Logo --> 
+
+            <!-- Embraer Logo -->
             <div class="embraer-logo">
                 <a href="/index.html" class="logo-link" aria-label="Ir para página principal">
                     <img src="../../../assets/embraer-logo.svg" alt="Logo Embraer" style="height:50px;">
                 </a>
             </div>
-            
+
             <div class="header-actions">
                 <button id="add-item-btn" class="btn btn-primary btn-pulse">
                     <i class="fas fa-plus"></i>
@@ -36,7 +37,7 @@
     </header>
 
     <!-- Sidebar -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
         <button id="close-sidebar" class="close-sidebar">
             <i class="fas fa-times"></i>
         </button>
@@ -148,6 +149,7 @@
                     <thead>
                         <tr>
                             <th>Limpo</th>
+                            <th class="center-column">Ponto</th>
                             <th class="center-column">Data da Verificação</th>
                             <th class="right-column">Observação</th>
                         </tr>
@@ -183,17 +185,17 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p class="modal-description" id="modal-description">Adicione um novo registro preenchendo as informações abaixo.</p>
-                
-                <!-- FORM alterado -->
+                <p class="modal-description" id="modal-description">
+                    Adicione um novo registro ao estoque preenchendo as informações abaixo.
+                </p>
+
                 <form id="item-form">
                     <div class="form-section">
                         <h4>Informações do Registro</h4>
                         <div class="form-grid">
-
                             <div class="form-group">
-                                <label for="limpo">Limpo</label>
-                                <select id="limpo" class="form-control" required>
+                                <label for="clean">Limpo</label>
+                                <select id="clean" class="form-control" required>
                                     <option value="">Selecione</option>
                                     <option value="Sim">Sim</option>
                                     <option value="Não">Não</option>
@@ -203,7 +205,7 @@
                             <div class="form-group">
                                 <label for="ponto">Ponto</label>
                                 <select id="ponto" class="form-control" required>
-                                    <option value="">Selecione</option>
+                                    <option value="">Selecione o ponto</option>
                                     <option value="163">163</option>
                                     <option value="164">164</option>
                                     <option value="165">165</option>
@@ -211,15 +213,14 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="verification-date">Data da Verificação</label>
-                                <input type="date" id="verification-date" required>
+                                <label for="verification-date">Data de Verificação</label>
+                                <input type="date" id="verification-date" class="form-control" required>
                             </div>
 
                             <div class="form-group form-group-full">
-                                <label for="observacao">Observação</label>
-                                <textarea id="observacao" class="form-control" rows="3" placeholder="Digite observações..."></textarea>
+                                <label for="observation">Observação</label>
+                                <textarea id="observation" class="form-control" rows="3" placeholder="Digite uma observação..."></textarea>
                             </div>
-
                         </div>
                     </div>
                 </form>
@@ -227,12 +228,10 @@
                 <div class="modal-footer">
                     <button class="btn btn-outline" id="cancel-modal-btn" type="button">Cancelar</button>
                     <button class="btn btn-outline" id="clear-form-btn" type="button">
-                        <i class="fas fa-undo"></i>
-                        Limpar
+                        <i class="fas fa-undo"></i> Limpar
                     </button>
                     <button type="button" class="btn btn-primary" id="save-item-btn">
-                        <i class="fas fa-save"></i>
-                        Salvar
+                        <i class="fas fa-save"></i> Salvar
                     </button>
                 </div>
             </div>
