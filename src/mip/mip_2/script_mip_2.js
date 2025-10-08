@@ -68,6 +68,61 @@ class StockManager {
     this.init();
 }
 
+async updateStatusCards() {
+        try {
+            const { data, error } = await supabase
+                .from("GESTAO_DE_ESTOQUE")
+                .select("status");
+
+            if (error) {
+                console.error("❌ Erro ao buscar dados dos cards:", error.message);
+                return;
+            }
+
+            if (!data || !Array.isArray(data)) {
+                console.error("❌ Dados inválidos retornados:", data);
+                return;
+            }
+
+            // Inicializa contadores
+            const statusCount = {
+                OK: 0,
+                "EM FALTA": 0,
+                VENCIDO: 0,
+                "EM DESCARTE": 0
+            };
+
+            // Conta cada status
+            data.forEach(item => {
+                const status = item.status?.trim()?.toUpperCase();
+                if (status && statusCount.hasOwnProperty(status)) {
+                    statusCount[status]++;
+                }
+            });
+
+            // Mapeia os status para os IDs corretos no HTML
+            const ids = {
+                OK: "ok-count",
+                "EM FALTA": "missing-count",
+                VENCIDO: "expired-count",
+                "EM DESCARTE": "discard-count"
+            };
+
+            // Atualiza o texto de cada card com a contagem
+            Object.entries(ids).forEach(([status, id]) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.textContent = statusCount[status] || 0;
+                }
+            });
+
+            console.log("📊 Status totais atualizados:", statusCount);
+
+        } catch (err) {
+            console.error("❌ Erro inesperado ao atualizar cards:", err);
+        }
+    }
+
     init() {
         this.bindEvents();
         this.loadFromDatabase();
