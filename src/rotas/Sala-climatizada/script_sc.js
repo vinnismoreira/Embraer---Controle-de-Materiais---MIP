@@ -245,7 +245,7 @@ class StockManager {
       data_de_verificacao: getVal('verification-date'),
       data_de_validade: getVal('expiry-date'),
       responsavel_pelo_registro: getVal('responsible'),
-      anexo: imageData
+      rota: getVal('route'),
     };
 
     try {
@@ -320,64 +320,49 @@ class StockManager {
     return filtered;
   }
 
-  renderTable() {
-    const tbody = document.getElementById('stock-table-body');
-    const noItemsMsg = document.getElementById('no-items-message');
-    if (!tbody) return;
+ renderTable() {
+  const tbody = document.getElementById('stock-table-body');
+  const noItemsMsg = document.getElementById('no-items-message');
+  if (!tbody) return;
 
-    const filtered = this.getFilteredItems();
+  const filtered = this.getFilteredItems();
 
-    if (!filtered.length) {
-      tbody.innerHTML = '';
-      if (noItemsMsg) noItemsMsg.style.display = 'block';
-      const itemsCountEl = document.getElementById('items-count');
-      if (itemsCountEl) itemsCountEl.textContent = `Exibindo 0 de ${this.stockItems.length} itens`;
-      return;
-    }
-
-    if (noItemsMsg) noItemsMsg.style.display = 'none';
+  if (!filtered.length) {
     tbody.innerHTML = '';
-
-    filtered.forEach(item => {
-      const row = document.createElement('tr');
-
-      // Coluna 1: Nome + miniatura (se houver)
-      const nomeCell = document.createElement('td');
-      nomeCell.innerHTML = `
-        <div style="display:flex;align-items:center;gap:8px;">
-          ${item.anexo ? `<img src="${item.anexo}" alt="thumb" style="width:56px;height:40px;object-fit:cover;border-radius:4px;border:1px solid #ddd;">` : ''}
-          <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px;">
-            ${item.pn || '-'}
-          </div>
-        </div>
-      `;
-
-      // Coluna 2: Respostas (usando quantidade como placeholder)
-      const respostasCell = document.createElement('td');
-      respostasCell.style.textAlign = 'center';
-      respostasCell.textContent = item.quantidade ?? '-';
-
-      // Coluna 3: Anexados (ícone que abre a imagem)
-      const anexadosCell = document.createElement('td');
-      anexadosCell.style.textAlign = 'center';
-      if (item.anexo) {
-        anexadosCell.innerHTML = `<a href="${item.anexo}" target="_blank" rel="noopener" title="Abrir anexo"><i class="fas fa-paperclip"></i></a>`;
-      } else {
-        anexadosCell.textContent = '-';
-      }
-
-      row.appendChild(nomeCell);
-      row.appendChild(respostasCell);
-      row.appendChild(anexadosCell);
-
-      // Se quiser permitir editar ao clicar na linha, você pode:
-      // row.addEventListener('dblclick', () => this.openModal(item.id));
-
-      tbody.appendChild(row);
-    });
-
-    this.updateItemsCount();
+    if (noItemsMsg) noItemsMsg.style.display = 'block';
+    const itemsCountEl = document.getElementById('items-count');
+    if (itemsCountEl) itemsCountEl.textContent = `Exibindo 0 de ${this.stockItems.length} itens`;
+    return;
   }
+
+  if (noItemsMsg) noItemsMsg.style.display = 'none';
+  tbody.innerHTML = '';
+
+  filtered.forEach(item => {
+    const row = document.createElement('tr');
+
+    // Coluna 1: Nome do material
+    const nomeCell = document.createElement('td');
+    nomeCell.innerHTML = `
+      <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px;">
+        ${item.pn || '-'}
+      </div>
+    `;
+
+    // Coluna 2: Resposta — mostra o valor da rota ou "Sim"
+    const respostaCell = document.createElement('td');
+    respostaCell.style.textAlign = 'center';
+    respostaCell.textContent = item.status || item.responsavel_pelo_registro || 'Sim';
+
+    row.appendChild(nomeCell);
+    row.appendChild(respostaCell);
+
+    tbody.appendChild(row);
+  });
+
+  this.updateItemsCount();
+}
+
 
   getStatusClass(status) {
     const classes = {
