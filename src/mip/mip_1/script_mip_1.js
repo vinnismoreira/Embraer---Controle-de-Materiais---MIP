@@ -61,58 +61,55 @@ class StockManager {
 
   async updateStatusCards() {
     try {
-      if (typeof supabase === "undefined") {
-        console.error("❌ Supabase não está definido.");
-        return;
-      }
+        const { data, error } = await supabase
+            .from("GESTAO_DE_ESTOQUE")
+            .select("status");
 
-      const { data, error } = await supabase
-        .from("GESTAO_DE_ESTOQUE")
-        .select("status");
-
-      if (error) {
-        console.error("❌ Erro ao buscar dados dos cards:", error.message);
-        alert("Erro ao carregar os status dos materiais.");
-        return;
-      }
-
-      if (!data || !Array.isArray(data)) {
-        console.error("❌ Dados inválidos retornados:", data);
-        return;
-      }
-
-      const statusCount = {
-        OK: 0,
-        "EM FALTA": 0,
-        VENCIDO: 0,
-        "EM DESCARTE": 0,
-      };
-
-      data.forEach((item) => {
-        const status = item.status?.trim()?.toUpperCase();
-        if (statusCount.hasOwnProperty(status)) {
-          statusCount[status]++;
+        if (error) {
+            console.error("❌ Erro ao buscar dados dos cards:", error.message);
+            return;
         }
-      });
 
-      const ids = {
-        OK: "card-ok",
-        "EM FALTA": "card-falta",
-        VENCIDO: "card-vencido",
-        "EM DESCARTE": "card-descarte",
-      };
+        if (!data || !Array.isArray(data)) {
+            console.error("❌ Dados inválidos retornados:", data);
+            return;
+        }
 
-      Object.entries(ids).forEach(([status, id]) => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = statusCount[status];
-      });
+        // Inicializa contadores
+        const statusCount = {
+            OK: 0,
+            "EM FALTA": 0,
+            VENCIDO: 0,
+            "EM DESCARTE": 0
+        };
 
-      console.log("📊 Cards atualizados:", statusCount);
+        // Conta cada status
+        data.forEach(item => {
+            const status = item.status?.trim()?.toUpperCase();
+            if (status && statusCount.hasOwnProperty(status)) {
+                statusCount[status]++;
+            }
+        });
+
+        // Atualiza cards no HTML
+        const ids = {
+            OK: "card-ok",
+            "EM FALTA": "card-falta",
+            VENCIDO: "card-vencido",
+            "EM DESCARTE": "card-descarte"
+        };
+
+        Object.entries(ids).forEach(([status, id]) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = statusCount[status] || 0;
+        });
+
+        console.log("📊 Status atualizados:", statusCount);
+
     } catch (err) {
-      console.error("❌ Erro inesperado ao atualizar cards:", err);
-      alert("Erro inesperado ao atualizar os cards de status.");
+        console.error("❌ Erro inesperado ao atualizar cards:", err);
     }
-  }
+}
     constructor() {
     this.stockItems = [];
     this.currentFilter = 'ALL';
