@@ -12,55 +12,107 @@ class StockManager {
 
     async loadFromDatabase() {
     try {
-        // 🔒 Lista de materiais que devem aparecer
-        const materiaisPermitidos = [
-            "SOLVE TS 500 LTT",
-            "MOLYKOTE 111",
-            "MOLYKOTE D 321 R",
-            "LEKTRO-TECH SUPER CORR-A",
-            "MOLYKOTE P37",
-            "ARDROX AV 15 AEROSOL",
-            "LOCTITE 7452",
-            "D-5026NS",
-            "UL120MS-PINK",
-            "BONDERITE M-CR 1132 AERO",
-            "WD40",
-            "ROYCO 44",
-            "MOLIKOTE DC-33 LIGHT",
-            "SOLVE IPA LTT",
-            "COR-BAN 27L",
-            "PSA529",
-            "LEAK-TEC 16-OX"
-        ];
+      const materiaisPermitidos = [
+        "SOLVE TS 500 LTT",
+        "MOLYKOTE 111",
+        "MOLYKOTE D 321 R",
+        "LEKTRO-TECH SUPER CORR-A",
+        "MOLYKOTE P37",
+        "ARDROX AV 15 AEROSOL",
+        "LOCTITE 7452",
+        "D-5026NS",
+        "UL120MS-PINK",
+        "BONDERITE M-CR 1132 AERO",
+        "WD40",
+        "ROYCO 44",
+        "MOLIKOTE DC-33 LIGHT",
+        "SOLVE IPA LTT",
+        "COR-BAN 27L",
+        "PSA529",
+        "LEAK-TEC 16-OX",
+      ];
 
-        // 🔽 Busca todos os registros da tabela principal
-        const { data, error } = await supabase
-            .from("GESTAO_DE_ESTOQUE")
-            .select("*")
-            .order("id", { ascending: false });
+      const { data, error } = await supabase
+        .from("GESTAO_DE_ESTOQUE")
+        .select("*")
+        .order("id", { ascending: false });
 
-        if (error) {
-            console.error("❌ Erro ao carregar dados:", error);
-            alert("Erro ao carregar dados do banco de dados.");
-            return;
-        }
+      if (error) {
+        console.error("❌ Erro ao carregar dados:", error);
+        alert("Erro ao carregar dados do banco de dados.");
+        return;
+      }
 
-        // 🎯 Filtra apenas os itens que estão na lista
-        const filtrados = data.filter(item =>
-            materiaisPermitidos.includes(item.nome_material?.trim())
-        );
+      const filtrados = data.filter((item) =>
+        materiaisPermitidos.includes(item.nome_material?.trim())
+      );
 
-        // 🧩 Atualiza a tabela exibida
-        this.stockItems = filtrados;
-        this.renderTable();
-        this.updateItemsCount();
+      this.stockItems = filtrados;
+      this.renderTable();
+      this.updateItemsCount();
+      await this.updateStatusCards();
 
-        console.log("✅ Itens filtrados carregados:", filtrados);
+      console.log("✅ Itens filtrados carregados:", filtrados);
     } catch (err) {
-        console.error("❌ Erro inesperado ao carregar dados:", err);
-        alert("Erro inesperado ao carregar os dados.");
+      console.error("❌ Erro inesperado ao carregar dados:", err);
+      alert("Erro inesperado ao carregar os dados.");
     }
-}
+  }
+
+  async updateStatusCards() {
+    try {
+      if (typeof supabase === "undefined") {
+        console.error("❌ Supabase não está definido.");
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("GESTAO_DE_ESTOQUE")
+        .select("status");
+
+      if (error) {
+        console.error("❌ Erro ao buscar dados dos cards:", error.message);
+        alert("Erro ao carregar os status dos materiais.");
+        return;
+      }
+
+      if (!data || !Array.isArray(data)) {
+        console.error("❌ Dados inválidos retornados:", data);
+        return;
+      }
+
+      const statusCount = {
+        OK: 0,
+        "EM FALTA": 0,
+        VENCIDO: 0,
+        "EM DESCARTE": 0,
+      };
+
+      data.forEach((item) => {
+        const status = item.status?.trim()?.toUpperCase();
+        if (statusCount.hasOwnProperty(status)) {
+          statusCount[status]++;
+        }
+      });
+
+      const ids = {
+        OK: "card-ok",
+        "EM FALTA": "card-falta",
+        VENCIDO: "card-vencido",
+        "EM DESCARTE": "card-descarte",
+      };
+
+      Object.entries(ids).forEach(([status, id]) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = statusCount[status];
+      });
+
+      console.log("📊 Cards atualizados:", statusCount);
+    } catch (err) {
+      console.error("❌ Erro inesperado ao atualizar cards:", err);
+      alert("Erro inesperado ao atualizar os cards de status.");
+    }
+  }
     constructor() {
     this.stockItems = [];
     this.currentFilter = 'ALL';
