@@ -324,7 +324,6 @@ const materiaisDB = [
     { name: "RTV159", code: "9129347", desc: "SELANTE, SILICONE, ALTA TEMP" },
     { name: "RTV732", code: "1453588", desc: "SELANTE, SILICONE, INCOLOR" },
     { name: "S1006-KIT-A", code: "5263329", desc: "ADESIVO, EPOXI, CABLAGENS ELETRICAS" }
-    { name: "LOCTITE 496", code: "4210826", desc: "ADESIVO, CIANOACRILATO, TIPO I" }
 ];
 
 // Popula selects
