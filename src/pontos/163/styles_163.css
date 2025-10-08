@@ -239,107 +239,34 @@ textarea {
     resize: vertical;
 }
 
-/* ===== TABELA AJUSTADA ===== */
+/* Table */
 .table-container {
-    width: 100%;
-    overflow-x: auto; /* permite rolagem horizontal se necessário */
+    overflow-x: auto;
 }
 
 .stock-table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed; /* garante que use 100% da largura e sem sobra */
 }
 
-.stock-table th,
-.stock-table td {
-    padding: 10px 12px;
-    border-bottom: 1px solid #ddd;
-    font-size: 0.875rem;
-    word-wrap: break-word;
-    text-align: left;
-}
-
-/* ===== Proporções das colunas ===== */
-.stock-table th:nth-child(1),
-.stock-table td:nth-child(1) {  /* Limpo */
-    width: 10%;
-    text-align: center;
-}
-
-.stock-table th:nth-child(2),
-.stock-table td:nth-child(2) {  /* Ponto */
-    width: 10%;
-    text-align: center;
-}
-
-.stock-table th:nth-child(3),
-.stock-table td:nth-child(3) {  /* Data da Verificação */
-    width: 20%;
-    text-align: center;
-}
-
-.stock-table th:nth-child(4),
-.stock-table td:nth-child(4) {  /* Observação */
-    width: 60%;
-    text-align: left;
-}
-
-/* ===== Estilo visual ===== */
 .stock-table th {
     background-color: #eff6ff;
     color: #1e40af;
     font-weight: 600;
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #bfdbfe;
+    font-size: 0.875rem;
+}
+
+.stock-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.875rem;
 }
 
 .stock-table tr:hover {
-    background-color: #f9fafb;
-}
-
-.no-items {
-    text-align: center;
-    padding: 2rem;
-    color: #6b7280;
-}
-
-/* ===== RESPONSIVIDADE ===== */
-@media (max-width: 768px) {
-    .stock-table {
-        font-size: 0.8rem;
-    }
-
-    .stock-table th,
-    .stock-table td {
-        padding: 8px;
-    }
-
-    /* Colunas ajustam para melhor leitura */
-    .stock-table th:nth-child(1),
-    .stock-table td:nth-child(1) { width: 15%; }  /* Limpo */
-    .stock-table th:nth-child(2),
-    .stock-table td:nth-child(2) { width: 15%; }  /* Ponto */
-    .stock-table th:nth-child(3),
-    .stock-table td:nth-child(3) { width: 25%; }  /* Data */
-    .stock-table th:nth-child(4),
-    .stock-table td:nth-child(4) { width: 45%; }  /* Observação */
-}
-
-@media (max-width: 480px) {
-    /* Reduz ainda mais para caber sem quebra */
-    .stock-table th,
-    .stock-table td {
-        font-size: 0.75rem;
-        padding: 6px;
-    }
-
-    .stock-table th:nth-child(1),
-    .stock-table td:nth-child(1) { width: 20%; }  /* Limpo */
-    .stock-table th:nth-child(2),
-    .stock-table td:nth-child(2) { width: 20%; }  /* Ponto */
-    .stock-table th:nth-child(3),
-    .stock-table td:nth-child(3) { width: 25%; }  /* Data */
-    .stock-table th:nth-child(4),
-    .stock-table td:nth-child(4) { width: 35%; }  /* Observação */
+    background-color: #eff6ff;
 }
 
 .product-cell {
