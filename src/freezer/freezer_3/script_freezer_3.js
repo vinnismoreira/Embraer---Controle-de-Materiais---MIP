@@ -12,65 +12,25 @@ class StockManager {
 
     async loadFromDatabase() {
     try {
-      const materiaisPermitidos = [
-        "COMPOSTO,EPOXI, CARGA MICROESFERA",
-        "ADESIVO,CONTATO,POLICLOROPRENE AMAR",
-        "ADESIVO,EPOXI,TIPO 4.3 PER CDM200-0",
-        "SELANTE,SILICONE,BRANCO, TIPO S, GR",
-        "SELANTE,SILICONE, PRETO,TIPO S, GRA",
-        "ADESIVO,EPOXI,AV 138,COMPONENTE A",
-        "ADESIVO,ACRILICO",
-        "ADESIVO,EPOXI,TIPO II",
-        "ADESIVO,EPOXI, TIPO III",
-        "ADESIVO,ELASTOMERICO,BORRACHA SINTE",
-        "ADESIVO,EPOXI,TIPO IV",
-        "SELANTE,POLIURETANO,BORDA,TRANSPARE",
-        "SELANTE,POLIURETANO, VERDE, AUTO NI",
-        "CATALISADOR,ADESIVO AV138,COMPONENT B",
-        "ADESIVO,ELASTOMERICO,RESISTENTE A COMB",
-        "ADESIVO,ANAEROBICO, TRAVAMENTO,TIPO",
-        "ADESIVO ANAEROBICO P/TRAVAMENTO LOC",
-        "ADESIVO,ANAEROBICO, TRAVAMENTO,TIPO",
-        "ADESIVO,ANAEROBICO, TRAVAMENTO,TIPO",
-        "NYCOTE 7-11-DARK BLUE",
-        "SELANTE-GRUPO 1,TIPO I,SILICONE",
-        "SELANTE,SILICONE,GRUPO III,TIPO I,V",
-        "SELANTE,SILICONE,CINZA",
-        "ADESIVO-SELANTE,RTV,SILICONE"
-        "SELANTE,SILICONE,INCOLOR,CURA ACIDO",
-        "SELANTE,SILICONE-GRUPO I,TIPO I,TRA",
-        "ADESIVO DE SILICONE",
-        "ADESIVO,EPOXI, CABLAGENS ELETRICAS",
-        "LOCTITE 601",
-      ];
+        const { data, error } = await supabase
+            .from("GESTAO_DE_ESTOQUE")
+            .select("*")
+            .order("id", { ascending: false });
 
-      const { data, error } = await supabase
-        .from("GESTAO_DE_ESTOQUE")
-        .select("*")
-        .order("id", { ascending: false });
+        if (error) {
+            console.error("❌ Erro ao carregar dados do Supabase:", error.message);
+            alert("Erro ao carregar dados do banco: " + error.message);
+            return;
+        }
 
-      if (error) {
-        console.error("❌ Erro ao carregar dados:", error);
-        alert("Erro ao carregar dados do banco de dados.");
-        return;
-      }
-
-      // ✅ Filtra pela lista de materiais
-      const filtrados = data.filter(item =>
-        materiaisPermitidos.includes(item.pn?.trim())
-      );
-
-      this.stockItems = filtrados;
-      this.renderTable();
-      this.updateItemsCount();
-      await this.updateStatusCards();
-
-      console.log("✅ Itens filtrados carregados:", filtrados);
+        this.stockItems = data || [];
+        this.renderTable();
+        this.updateItemsCount();
     } catch (err) {
-      console.error("❌ Erro inesperado ao carregar dados:", err);
-      alert("Itens filtrados carregados.");
+        console.error("❌ Erro inesperado ao carregar dados:", err);
+        alert("Erro inesperado ao carregar dados do banco.");
     }
-
+}
 
     constructor() {
     this.stockItems = [];
