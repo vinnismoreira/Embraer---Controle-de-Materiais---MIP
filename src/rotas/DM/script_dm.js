@@ -386,3 +386,28 @@ class StockManager {
 document.addEventListener("DOMContentLoaded", () => {
   window.stockManager = new StockManager();
 });
+
+// ===============================
+//  CONTROLE DA SIDEBAR
+// ===============================
+document.addEventListener("DOMContentLoaded", () => {
+  const sidebar = document.querySelector(".sidebar");
+  const toggleBtn = document.getElementById("sidebar-toggle");
+
+  if (toggleBtn && sidebar) {
+    toggleBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("active");
+    });
+  }
+
+  // Fecha a sidebar ao clicar fora (opcional)
+  document.addEventListener("click", (e) => {
+    if (
+      sidebar?.classList.contains("active") &&
+      !sidebar.contains(e.target) &&
+      !toggleBtn.contains(e.target)
+    ) {
+      sidebar.classList.remove("active");
+    }
+  });
+});
