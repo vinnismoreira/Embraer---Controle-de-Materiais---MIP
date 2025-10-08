@@ -12,26 +12,55 @@ class StockManager {
 
     async loadFromDatabase() {
     try {
+        // 🔒 Lista de materiais que devem aparecer
+        const materiaisPermitidos = [
+            "SOLVE TS 500 LTT",
+            "MOLYKOTE 111",
+            "MOLYKOTE D 321 R",
+            "LEKTRO-TECH SUPER CORR-A",
+            "MOLYKOTE P37",
+            "ARDROX AV 15 AEROSOL",
+            "LOCTITE 7452",
+            "D-5026NS",
+            "UL120MS-PINK",
+            "BONDERITE M-CR 1132 AERO",
+            "WD40",
+            "ROYCO 44",
+            "MOLIKOTE DC-33 LIGHT",
+            "SOLVE IPA LTT",
+            "COR-BAN 27L",
+            "PSA529",
+            "LEAK-TEC 16-OX"
+        ];
+
+        // 🔽 Busca todos os registros da tabela principal
         const { data, error } = await supabase
             .from("GESTAO_DE_ESTOQUE")
             .select("*")
             .order("id", { ascending: false });
 
         if (error) {
-            console.error("❌ Erro ao carregar dados do Supabase:", error.message);
-            alert("Erro ao carregar dados do banco: " + error.message);
+            console.error("❌ Erro ao carregar dados:", error);
+            alert("Erro ao carregar dados do banco de dados.");
             return;
         }
 
-        this.stockItems = data || [];
+        // 🎯 Filtra apenas os itens que estão na lista
+        const filtrados = data.filter(item =>
+            materiaisPermitidos.includes(item.nome_material?.trim())
+        );
+
+        // 🧩 Atualiza a tabela exibida
+        this.stockItems = filtrados;
         this.renderTable();
         this.updateItemsCount();
+
+        console.log("✅ Itens filtrados carregados:", filtrados);
     } catch (err) {
         console.error("❌ Erro inesperado ao carregar dados:", err);
-        alert("Erro inesperado ao carregar dados do banco.");
+        alert("Erro inesperado ao carregar os dados.");
     }
 }
-
     constructor() {
     this.stockItems = [];
     this.currentFilter = 'ALL';
