@@ -39,7 +39,7 @@ class StockManager {
       }
 
       const filtrados = data.filter((item) =>
-        materiaisPermitidos.includes(item.nome_material?.trim())
+        materiaisPermitidos.includes(item.pn?.trim())
       );
 
       this.stockItems = filtrados;
