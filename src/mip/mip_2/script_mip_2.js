@@ -14,20 +14,22 @@ class StockManager {
     try {
       const materiaisPermitidos = [
         "SOLVE TS 500 LTT",
+        "MOLYKOTE 111",
         "MOLYKOTE D 321 R",
-        "00916 (AEROSOL)",
         "LEKTRO-TECH SUPER CORR-A",
-        "ECODE594386",
+        "MOLYKOTE P37",
         "ARDROX AV 15 AEROSOL",
         "LOCTITE 7452",
         "D-5026NS",
         "UL120MS-PINK",
         "BONDERITE M-CR 1132 AERO",
         "WD40",
-        "NHE376 ",
+        "ROYCO 44",
         "MOLIKOTE DC-33 LIGHT",
         "SOLVE IPA LTT",
         "COR-BAN 27L",
+        "PSA529",
+        "LEAK-TEC 16-OX"
       ];
 
       const { data, error } = await supabase
@@ -41,8 +43,9 @@ class StockManager {
         return;
       }
 
-      const filtrados = data.filter((item) =>
-        materiaisPermitidos.includes(item.nome_material?.trim())
+      // ✅ Filtra pela lista de materiais
+      const filtrados = data.filter(item =>
+        materiaisPermitidos.includes(item.pn?.trim())
       );
 
       this.stockItems = filtrados;
@@ -55,7 +58,7 @@ class StockManager {
       console.error("❌ Erro inesperado ao carregar dados:", err);
       alert("Erro inesperado ao carregar os dados.");
     }
-  }
+}
 
     constructor() {
     this.stockItems = [];
