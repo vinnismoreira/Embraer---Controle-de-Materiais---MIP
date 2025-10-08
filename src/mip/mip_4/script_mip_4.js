@@ -49,7 +49,9 @@ class StockManager {
 
       console.log("✅ Itens filtrados carregados:", filtrados);
     } catch (err) {
-
+      console.error("❌ Erro inesperado ao carregar dados:", err);
+      alert("Itens filtrados carregados.");
+    }
   }
 
     constructor() {
