@@ -942,26 +942,3 @@ body.sidebar-open {
         font-size: 0.75rem;
     }
 }
-
-#image-upload {
-    display: block;
-    margin-top: 8px;
-}
-
-#preview img {
-    max-width: 100%;
-    max-height: 200px;
-    margin-top: 8px;
-    border-radius: 6px;
-    border: 1px solid #d1d5db;
-}
-
-.stock-table a {
-    color: #2563eb;
-    text-decoration: none;
-    font-size: 1.1rem;
-}
-
-.stock-table a:hover {
-    color: #1e40af;
-}
