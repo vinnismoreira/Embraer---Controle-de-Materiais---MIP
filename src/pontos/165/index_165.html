@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Embraer - Controle de Estoque MIP</title>
-    <link rel="stylesheet" href="styles_index.css">
+    <link rel="stylesheet" href="styles_165.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="icon" type="image/png" href="assets/embraer-aviao.png">
+    <link rel="icon" type="image/png" href="../../../assets/embraer-aviao.png">
 </head>
 <body>
     <!-- Toast Container -->
@@ -21,12 +21,10 @@
 </button>
             <!-- Embraer Logo --> 
             <div class="embraer-logo">
-                <div class="logo-icon">
-                    <!-- ajuste o caminho da imagem conforme seu ambiente -->
-                    <img src="assets/embraer-logo.svg" alt="Logo Embraer" style="height:50px;">
-                </div>
-                <div class="logo-text"></div>
-            </div>
+  <a href="/index.html" class="logo-link" aria-label="Ir para página principal">
+    <img src="../../../assets/embraer-logo.svg" alt="Logo Embraer" style="height:50px;">
+  </a>
+</div>
             
             <div class="header-actions">
                 <button id="add-item-btn" class="btn btn-primary btn-pulse">
@@ -123,7 +121,6 @@
         </li>
 </aside>
 
-
     <div class="container">
         <!-- Filters -->
         <div class="card filters-card">
@@ -151,28 +148,24 @@
             </div>
         </div>
 
-        <!-- Table -->
-        <div class="card table-card">
-            <div class="table-container">
-                <table class="stock-table">
-                    <thead>
-                        <tr>
-                            <th>Nome do Produto</th>
-                            <th>ECODE</th>
-                            <th>Quantidade</th>
-                            <th>Verificado por</th>
-                            <th>Status</th>
-                            <th>Motivo de Descarte</th> <!-- NOVO -->
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="stock-table-body"></tbody>
-                </table>
-                <div id="no-items-message" class="no-items" style="display: none;">
-                    Nenhum item encontrado
-                </div>
-            </div>
+  <!-- Tabela Simplificada -->
+<div class="card table-card">
+    <div class="table-container">
+        <table class="stock-table">
+            <thead>
+                <tr>
+                    <th>Limpo</th>
+                    <th class="center-column">Data da Verificação</th>
+                    <th class="right-column">Observação</th>
+                </tr>
+            </thead>
+            <tbody id="stock-table-body"></tbody>
+        </table>
+        <div id="no-items-message" class="no-items" style="display: none;">
+            Nenhum item encontrado
         </div>
+    </div>
+</div>
 
         <!-- Pagination -->
         <div class="pagination">
@@ -315,7 +308,7 @@
         </div>
     </div>
 
-    <script type="module" src="script_index.js"></script>
+    <script type="module" src="script_165.js"></script>
 
 </body>
 </html>
