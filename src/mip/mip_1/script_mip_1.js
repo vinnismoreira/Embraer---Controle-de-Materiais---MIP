@@ -91,20 +91,22 @@ class StockManager {
             }
         });
 
-        // Atualiza cards no HTML
+        // Atualiza cards no HTML (COM OS IDs CORRIGIDOS)
         const ids = {
-            OK: "card-ok",
-            "EM FALTA": "card-falta",
-            VENCIDO: "card-vencido",
-            "EM DESCARTE": "card-descarte"
+            OK: "ok-count",
+            "EM FALTA": "missing-count",
+            VENCIDO: "expired-count",
+            "EM DESCARTE": "discard-count"
         };
 
         Object.entries(ids).forEach(([status, id]) => {
             const el = document.getElementById(id);
-            if (el) el.textContent = statusCount[status] || 0;
+            if (el) {
+                el.textContent = statusCount[status] || 0;
+            }
         });
 
-        console.log("📊 Status atualizados:", statusCount);
+        console.log("📊 Status totais atualizados:", statusCount);
 
     } catch (err) {
         console.error("❌ Erro inesperado ao atualizar cards:", err);
