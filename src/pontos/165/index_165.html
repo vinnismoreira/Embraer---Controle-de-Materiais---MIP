@@ -16,16 +16,17 @@
     <header class="header">
         <div class="header-content">
             <!-- Botão para abrir o menu -->
-<button id="menu-toggle" class="menu-toggle">
-    <i class="fas fa-bars"></i>
-</button>
-            <!-- Embraer Logo --> 
+            <button id="menu-toggle" class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Embraer Logo -->
             <div class="embraer-logo">
-  <a href="/index.html" class="logo-link" aria-label="Ir para página principal">
-    <img src="../../../assets/embraer-logo.svg" alt="Logo Embraer" style="height:50px;">
-  </a>
-</div>
-            
+                <a href="/index.html" class="logo-link" aria-label="Ir para página principal">
+                    <img src="../../../assets/embraer-logo.svg" alt="Logo Embraer" style="height:50px;">
+                </a>
+            </div>
+
             <div class="header-actions">
                 <button id="add-item-btn" class="btn btn-primary btn-pulse">
                     <i class="fas fa-plus"></i>
@@ -36,89 +37,86 @@
     </header>
 
     <!-- Sidebar -->
-<aside class="sidebar">
-    <button id="close-sidebar" class="close-sidebar">
-  <i class="fas fa-times"></i>
-</button>
-<aside class="sidebar" id="sidebar">
-  </button>
-  <!-- ... resto do conteúdo ... -->
-</aside>
-    <ul class="sidebar-menu">
-        <!-- Rota -->
-        <li class="sidebar-item">
-            <a href="#" class="sidebar-link">
-                <i class="fas fa-route"></i> Rota 
-                <i class="fas fa-chevron-down dropdown-icon"></i>
-            </a>
-            <ul class="sidebar-submenu">
-                <li><a href="/src/rotas/DM/index_dm.html">DM</a></li>
-                <li><a href="/src/rotas/Sucata/index_sucata.html">Sucata</a></li>
-                <li><a href="/src/rotas/Reparo/index_reparo.html">Reparo</a></li>
-                <li><a href="/src/rotas/Sala-climatizada/index_sc.html">Sala Climatizada</a></li>
-                <li><a href="/src/rotas/Quarentena/index_quarentena.html">Quarentena</a></li>
-            </ul>
-        </li>
+    <aside class="sidebar" id="sidebar">
+        <button id="close-sidebar" class="close-sidebar">
+            <i class="fas fa-times"></i>
+        </button>
+        <ul class="sidebar-menu">
+            <!-- Rota -->
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link">
+                    <i class="fas fa-route"></i> Rota 
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                </a>
+                <ul class="sidebar-submenu">
+                    <li><a href="/src/rotas/DM/index_dm.html">DM</a></li>
+                    <li><a href="/src/rotas/Sucata/index_sucata.html">Sucata</a></li>
+                    <li><a href="/src/rotas/Reparo/index_reparo.html">Reparo</a></li>
+                    <li><a href="/src/rotas/Sala-climatizada/index_sc.html">Sala Climatizada</a></li>
+                    <li><a href="/src/rotas/Quarentena/index_quarentena.html">Quarentena</a></li>
+                </ul>
+            </li>
 
-        <!-- MIP -->
-        <li class="sidebar-item">
-            <a href="#" class="sidebar-link">
-                <i class="fas fa-boxes"></i> MIP
-                <i class="fas fa-chevron-down dropdown-icon"></i>
-            </a>
-            <ul class="sidebar-submenu">
-                <li><a href="/src/mip/mip_1/index_mip_1.html">1</a></li>
-                <li><a href="/src/mip/mip_2/index_mip_2.html">2</a></li>
-                <li><a href="/src/mip/mip_3/index_mip_3.html">3</a></li>
-                <li><a href="/src/mip/mip_4/index_mip_4.html">4</a></li>
-            </ul>
-        </li>
+            <!-- MIP -->
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link">
+                    <i class="fas fa-boxes"></i> MIP
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                </a>
+                <ul class="sidebar-submenu">
+                    <li><a href="/src/mip/mip_1/index_mip_1.html">1</a></li>
+                    <li><a href="/src/mip/mip_2/index_mip_2.html">2</a></li>
+                    <li><a href="/src/mip/mip_3/index_mip_3.html">3</a></li>
+                    <li><a href="/src/mip/mip_4/index_mip_4.html">4</a></li>
+                </ul>
+            </li>
 
-        <!-- Freezer -->
-        <li class="sidebar-item">
-            <a href="#" class="sidebar-link">
-                <i class="fas fa-snowflake"></i> Freezer
-                <i class="fas fa-chevron-down dropdown-icon"></i>
-            </a>
-            <ul class="sidebar-submenu">
-                <li><a href="/src/freezer/freezer_2/index_freezer_2.html">2</a></li>
-                <li><a href="/src/freezer/freezer_3/index_freezer_3.html">3</a></li>
-            </ul>
-        </li>
+            <!-- Freezer -->
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link">
+                    <i class="fas fa-snowflake"></i> Freezer
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                </a>
+                <ul class="sidebar-submenu">
+                    <li><a href="/src/freezer/freezer_2/index_freezer_2.html">2</a></li>
+                    <li><a href="/src/freezer/freezer_3/index_freezer_3.html">3</a></li>
+                </ul>
+            </li>
 
-        <!-- Ponto -->
-        <li class="sidebar-item">
-            <a href="#" class="sidebar-link">
-                <i class="fas fa-map-marker-alt"></i> Ponto
-                <i class="fas fa-chevron-down dropdown-icon"></i>
-            </a>
-            <ul class="sidebar-submenu">
-                <li><a href="/src/pontos/163/index_163.html">163</a></li>
-                <li><a href="/src/pontos/164/index_164.html">164</a></li>
-                <li><a href="/src/pontos/165/index_165.html">165</a></li>
-            </ul>
-        </li>
+            <!-- Ponto -->
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link">
+                    <i class="fas fa-map-marker-alt"></i> Ponto
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                </a>
+                <ul class="sidebar-submenu">
+                    <li><a href="/src/pontos/163/index_163.html">163</a></li>
+                    <li><a href="/src/pontos/164/index_164.html">164</a></li>
+                    <li><a href="/src/pontos/165/index_165.html">165</a></li>
+                </ul>
+            </li>
 
-        <!-- PDU -->
-        <li class="sidebar-item">
-            <a href="#" class="sidebar-link">
-                <i class="fas fa-plug"></i> PDU
-            </a>
-        </li>
-    </ul>
-    <!-- Site -->
-         <li class="sidebar-item">
-            <a href="#" class="sidebar-link">
-                <i class="fas fa-route"></i> Site
-                <i class="fa-solid fa-chevron-down"></i>
-            </a>
-            <ul class="sidebar-submenu">
+            <!-- PDU -->
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link">
+                    <i class="fas fa-plug"></i> PDU
+                </a>
+            </li>
+
+            <!-- Site -->
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link">
+                    <i class="fas fa-route"></i> Site
+                    <i class="fa-solid fa-chevron-down"></i>
+                </a>
+                <ul class="sidebar-submenu">
                 <li><a href="/index.html">SJK</a></li>
-                <li><a href="#">SOD</a></li>
-                <li><a href="#">GPX</a></li>
-            </ul>
-        </li>
-</aside>
+                    <li><a href="#">SOD</a></li>
+                    <li><a href="#">GPX</a></li>
+                </ul>
+            </li>
+        </ul>
+    </aside>
 
     <div class="container">
         <!-- Filters -->
@@ -137,34 +135,32 @@
                     <div class="filter-group">
                         <select id="status-filter">
                             <option value="ALL">Todos os Status</option>
-                            <option value="OK">OK</option>
-                            <option value="EM FALTA">EM FALTA</option>
-                            <option value="VENCIDO">VENCIDO</option>
-                            <option value="EM DESCARTE">EM DESCARTE</option>
+                            <option value="OK">ENVIADOS</option>
                         </select>
                     </div>
                 </div>
             </div>
         </div>
 
-  <!-- Tabela Simplificada -->
-<div class="card table-card">
-    <div class="table-container">
-        <table class="stock-table">
-            <thead>
-                <tr>
-                    <th>Limpo</th>
-                    <th class="center-column">Data da Verificação</th>
-                    <th class="right-column">Observação</th>
-                </tr>
-            </thead>
-            <tbody id="stock-table-body"></tbody>
-        </table>
-        <div id="no-items-message" class="no-items" style="display: none;">
-            Nenhum item encontrado
+        <!-- Tabela Simplificada -->
+        <div class="card table-card">
+            <div class="table-container">
+                <table class="stock-table">
+                    <thead>
+                        <tr>
+                            <th>Limpo</th>
+                            <th class="center-column">Ponto</th>
+                            <th class="center-column">Data da Verificação</th>
+                            <th class="right-column">Observação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stock-table-body"></tbody>
+                </table>
+                <div id="no-items-message" class="no-items" style="display: none;">
+                    Nenhum item encontrado
+                </div>
+            </div>
         </div>
-    </div>
-</div>
 
         <!-- Pagination -->
         <div class="pagination">
@@ -189,125 +185,59 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p class="modal-description" id="modal-description">Adicione um novo registro ao estoque preenchendo as informações abaixo.</p>
+                <p class="modal-description" id="modal-description">
+                    Adicione um novo registro ao estoque preenchendo as informações abaixo.
+                </p>
+
                 <form id="item-form">
-                    <!-- Informações Básicas -->
                     <div class="form-section">
-                        <h4>Informações Básicas</h4>
+                        <h4>Informações do Registro</h4>
                         <div class="form-grid">
-                            <!-- Nome do Material -->
                             <div class="form-group">
-                                <label for="material-name">PN</label>
-                                <select id="material-name" class="form-control" required>
-                                    <option value="">Selecione um PN</option>
-                                    <!-- opções serão preenchidas via JavaScript -->
+                                <label for="clean">Limpo</label>
+                                <select id="clean" class="form-control" required>
+                                    <option value="">Selecione</option>
+                                    <option value="Sim">Sim</option>
+                                    <option value="Não">Não</option>
                                 </select>
                             </div>
-                
-                            <!-- ECODE -->
+
                             <div class="form-group">
-                                <label for="material-id">ECODE</label>
-                                <select id="material-id" class="form-control" required>
-                                    <option value="">Selecione o ECODE</option>
-                                    <!-- opções serão preenchidas via JavaScript -->
+                                <label for="ponto">Ponto</label>
+                                <select id="ponto" class="form-control" required>
+                                    <option value="">Selecione o ponto</option>
+                                    <option value="163">163</option>
+                                    <option value="164">164</option>
+                                    <option value="165">165</option>
                                 </select>
                             </div>
-                
-                            <!-- Descrição -->
-                            <div class="form-group">
-                                <label for="material-desc">Descrição</label>
-                                <select id="material-desc" class="form-control" required>
-                                    <option value="">Selecione a descrição</option>
-                                    <!-- opções serão preenchidas via JavaScript -->
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                
-                    <!-- Informações Complementares -->
-                    <div class="form-section">
-                        <h4>Informações Complementares</h4>
-                        <div class="form-grid">
-                            <!-- Localização no Estoque -->
-                            <div class="form-group">
-                                <label for="location">Localização no Estoque</label>
-                                <select id="location" class="form-control" required>
-                                    <option value="">Selecione a localização</option>
-                                    <option value="Bandeja 1">Bandeja 1</option>
-                                    <option value="Bandeja 2">Bandeja 2</option>
-                                    <option value="Freezer 1">Freezer 1</option>
-                                    <option value="Freezer 2">Freezer 2</option>
-                                    <option value="Freezer 3">Freezer 3</option>
-                                </select>
-                            </div>
-                
-                            <!-- Motivo de Descarte -->
-                            <div class="form-group">
-                                <label for="discard-reason">Motivo de Descarte</label>
-                                <select id="discard-reason">
-                                    <option value="">Selecione o motivo</option>
-                                    <option value="Nenhum Uso">Nenhum Uso</option>
-                                    <option value="Total">Uso Total</option>
-                                    <option value="Validade Vencida">Validade Vencida</option>
-                                </select>
-                            </div>
-                
-                            <!-- Data de Verificação -->
+
                             <div class="form-group">
                                 <label for="verification-date">Data de Verificação</label>
-                                <input type="date" id="verification-date" required>
+                                <input type="date" id="verification-date" class="form-control" required>
                             </div>
-                
-                            <!-- Data de Validade -->
-                            <div class="form-group">
-                                <label for="expiry-date">Data de Validade</label>
-                                <input type="date" id="expiry-date">
-                            </div>
-                        </div>
-                
-                        <!-- Responsável pelo Cadastro -->
-                        <div class="form-group form-group-full">
-                            <label for="responsible">Responsável pelo Registro</label>
-                            <select id="responsible" class="form-control" required>
-                                <option value="">Selecione o responsável</option>
-                                <option value="Glauco">Glauco</option>
-                                <option value="Lucas Santos">Lucas Santos</option>
-                                <option value="Jean">Jean</option>
-                            </select>
-                        </div>
 
-                        <div class="form-group">
-                            <label for="quantity">Quantidade</label>
-                            <input type="number" id="quantity" min="1" value="1" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="status">Status *</label>
-                            <select id="status" required>
-                                <option value="OK">OK</option>
-                                <option value="EM FALTA">EM FALTA</option>
-                                <option value="VENCIDO">VENCIDO</option>
-                                <option value="EM DESCARTE">EM DESCARTE</option>
-                            </select>
+                            <div class="form-group form-group-full">
+                                <label for="observation">Observação</label>
+                                <textarea id="observation" class="form-control" rows="3" placeholder="Digite uma observação..."></textarea>
+                            </div>
                         </div>
                     </div>
                 </form>
-            <div class="modal-footer">
-                <button class="btn btn-outline" id="cancel-modal-btn" type="button">Cancelar</button>
-                <button class="btn btn-outline" id="clear-form-btn" type="button">
-                    <i class="fas fa-undo"></i>
-                    Limpar
-                </button>
-                <!-- importante: type="button" para não submeter o form -->
-                <button type="button" class="btn btn-primary" id="save-item-btn">
-                    <i class="fas fa-save"></i>
-                    Salvar
-                </button>
+
+                <div class="modal-footer">
+                    <button class="btn btn-outline" id="cancel-modal-btn" type="button">Cancelar</button>
+                    <button class="btn btn-outline" id="clear-form-btn" type="button">
+                        <i class="fas fa-undo"></i> Limpar
+                    </button>
+                    <button type="button" class="btn btn-primary" id="save-item-btn">
+                        <i class="fas fa-save"></i> Salvar
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
     <script type="module" src="script_165.js"></script>
-
 </body>
 </html>
