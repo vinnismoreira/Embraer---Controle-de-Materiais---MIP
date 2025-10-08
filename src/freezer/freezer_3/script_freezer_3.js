@@ -11,28 +11,32 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 class StockManager {
 
     async loadFromDatabase() {
-    try {
-        const { data, error } = await supabase
-            .from("GESTAO_DE_ESTOQUE")
-            .select("*")
-            .order("id", { ascending: false });
+  try {
+    const { data, error } = await supabase
+      .from("GESTAO_DE_ESTOQUE")
+      .select("*")
+      .order("id", { ascending: false });
 
-        if (error) {
-            console.error("❌ Erro ao carregar dados do Supabase:", error.message);
-            alert("Erro ao carregar dados do banco: " + error.message);
-            return;
-        }
-
-        this.totalStockCount = (data || []).length;
-
-        this.stockItems = data || [];
-        this.renderTable();
-        this.updateItemsCount();
-    } catch (err) {
-        console.error("❌ Erro inesperado ao carregar dados:", err);
-        alert("Erro inesperado ao carregar dados do banco.");
+    if (error) {
+      console.error("❌ Erro ao carregar dados do Supabase:", error.message);
+      alert("Erro ao carregar dados do banco: " + error.message);
+      return;
     }
+
+    this.totalStockCount = (data || []).length;
+    this.stockItems = data || [];
+    this.renderTable();
+    this.updateItemsCount();
+
+    // 🟢 Atualiza os cards de status
+    await this.updateStatusCards();
+
+  } catch (err) {
+    console.error("❌ Erro inesperado ao carregar dados:", err);
+    alert("Erro inesperado ao carregar dados do banco.");
+  }
 }
+
 
     constructor() {
     this.stockItems = [];
@@ -224,10 +228,11 @@ async updateStatusCards() {
             });
 
             await this.loadFromDatabase();
-            this.renderTable();
-            this.updateItemsCount();
-            this.closeModal();
-            alert("✅ Registro salvo com sucesso!");
+await this.updateStatusCards(); // 🟢 adiciona isso logo após o load
+this.renderTable();
+this.updateItemsCount();
+this.closeModal();
+alert("✅ Registro salvo com sucesso!");
 
         } catch (err) {
             console.error("❌ Erro inesperado:", err);
@@ -248,6 +253,7 @@ async updateStatusCards() {
 
         alert("🗑️ Item removido com sucesso!");
         await this.loadFromDatabase();
+await this.updateStatusCards(); // 🟢 adiciona isso logo após o load
     } catch (err) {
         console.error("❌ Erro ao excluir item:", err);
         alert("Erro ao excluir o item do banco.");
