@@ -13,19 +13,46 @@ class SimpleFormManager {
         this.items = JSON.parse(localStorage.getItem("REGISTROS_LIMPEZA")) || [];
         this.tableBody = document.getElementById("stock-table-body");
         this.noItemsMsg = document.getElementById("no-items-message");
+        this.modal = document.getElementById("item-modal");
         this.init();
     }
 
     init() {
+        // Botão principal de abrir o modal (Anotar Registro)
+        const openModalBtn = document.getElementById("add-item-btn");
+        if (openModalBtn) openModalBtn.addEventListener("click", () => this.openModal());
+
+        // Botões de fechar/cancelar/salvar
         const saveBtn = document.getElementById("save-item-btn");
         const cancelBtn = document.getElementById("cancel-modal-btn");
         const closeBtn = document.getElementById("close-modal-btn");
 
         if (saveBtn) saveBtn.addEventListener("click", () => this.saveItem());
-        if (cancelBtn) cancelBtn.addEventListener("click", () => this.clearForm());
-        if (closeBtn) closeBtn.addEventListener("click", () => this.clearForm());
+        if (cancelBtn) cancelBtn.addEventListener("click", () => this.closeModal());
+        if (closeBtn) closeBtn.addEventListener("click", () => this.closeModal());
+
+        // Clique fora do modal fecha também
+        if (this.modal) {
+            this.modal.addEventListener("click", e => {
+                if (e.target.id === "item-modal") this.closeModal();
+            });
+        }
 
         this.renderTable();
+    }
+
+    openModal() {
+        if (this.modal) {
+            this.modal.classList.add("active");
+            const today = new Date().toISOString().split("T")[0];
+            const verificationDate = document.getElementById("verification-date");
+            if (verificationDate) verificationDate.value = today;
+        }
+    }
+
+    closeModal() {
+        if (this.modal) this.modal.classList.remove("active");
+        this.clearForm();
     }
 
     getFormData() {
@@ -49,7 +76,7 @@ class SimpleFormManager {
         this.items.push(data);
         this.updateLocalStorage();
         this.renderTable();
-        this.clearForm();
+        this.closeModal();
         alert("✅ Registro salvo com sucesso!");
     }
 
