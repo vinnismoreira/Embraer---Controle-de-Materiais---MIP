@@ -132,67 +132,72 @@ class StockManager {
     }
 
     async saveItem() {
-        const formData = {
-            pn: document.getElementById('material-name').value,
-            ecode: document.getElementById('material-id').value,
-            descricao: document.getElementById('material-desc').value,
-            quantidade: parseInt(document.getElementById('quantity').value),
-            status: document.getElementById('status').value,
-            localizacao_no_estoque: document.getElementById('location').value,
-            motivo_de_descarte: document.getElementById('discard-reason').value,
-            data_de_verificacao: document.getElementById('verification-date').value,
-            data_de_validade: document.getElementById('expiry-date').value,
-            responsavel_pelo_registro: document.getElementById('responsible').value,
-        };
+    const nome = document.getElementById('material-name').value.trim();
+    const codigo = document.getElementById('material-id').value.trim();
+    const descricao = document.getElementById('material-desc').value.trim();
 
-        try {
-            const { data, error } = await supabase
-                .from("GESTAO_DE_ESTOQUE")
-                .insert([formData]);
+    // 🔒 Lista de materiais autorizados para inserir na tabela principal
+    const materiaisPermitidos = [
+        "SOLVE TS 500 LTT",
+        "MOLYKOTE 111",
+        "MOLYKOTE D 321 R",
+        "LEKTRO-TECH SUPER CORR-A",
+        "MOLYKOTE P37",
+        "ARDROX AV 15 AEROSOL",
+        "LOCTITE 7452",
+        "D-5026NS",
+        "UL120MS-PINK",
+        "BONDERITE M-CR 1132 AERO",
+        "WD40",
+        "ROYCO 44",
+        "MOLIKOTE DC-33 LIGHT",
+        "SOLVE IPA LTT",
+        "COR-BAN 27L",
+        "PSA529",
+        "LEAK-TEC 16-OX"
+    ];
 
-            if (error) {
-                console.error("❌ Erro ao salvar no Supabase:", error.message);
-                alert("Erro ao salvar no banco: " + error.message);
-                return;
-            }
-
-            console.log("✅ Registro salvo no Supabase:", data);
-
-            this.stockItems.push({
-                id: Date.now().toString(),
-                ...formData,
-                verifiedBy: formData.responsible,
-                verifiedDate: new Date(formData.verificationDate).toLocaleDateString('pt-BR'),
-            });
-
-            await this.loadFromDatabase();
-            this.renderTable();
-            this.updateItemsCount();
-            this.closeModal();
-            alert("✅ Registro salvo com sucesso!");
-
-        } catch (err) {
-            console.error("❌ Erro inesperado:", err);
-            alert("Erro inesperado ao salvar o item.");
-        }
+    // ⚠️ Bloqueia inserção de itens fora da lista
+    if (!materiaisPermitidos.includes(nome)) {
+        alert("⚠️ Este material não faz parte da lista autorizada e não será adicionado à tabela principal.");
+        return;
     }
 
-    async deleteItem(itemId) {
-    if (!confirm('Deseja realmente remover este item?')) return;
+    const formData = {
+        pn: nome,
+        ecode: codigo,
+        descricao: descricao,
+        quantidade: parseInt(document.getElementById('quantity').value),
+        status: document.getElementById('status').value,
+        localizacao_no_estoque: document.getElementById('location').value,
+        motivo_de_descarte: document.getElementById('discard-reason').value,
+        data_de_verificacao: document.getElementById('verification-date').value,
+        data_de_validade: document.getElementById('expiry-date').value,
+        responsavel_pelo_registro: document.getElementById('responsible').value,
+    };
 
     try {
-        const { error } = await supabase
+        const { data, error } = await supabase
             .from("GESTAO_DE_ESTOQUE")
-            .delete()
-            .eq("id", itemId);
+            .insert([formData]);
 
-        if (error) throw error;
+        if (error) {
+            console.error("❌ Erro ao salvar no Supabase:", error.message);
+            alert("Erro ao salvar no banco: " + error.message);
+            return;
+        }
 
-        alert("🗑️ Item removido com sucesso!");
+        console.log("✅ Registro salvo no Supabase:", data);
+
         await this.loadFromDatabase();
+        this.renderTable();
+        this.updateItemsCount();
+        this.closeModal();
+        alert("✅ Registro salvo com sucesso!");
+
     } catch (err) {
-        console.error("❌ Erro ao excluir item:", err);
-        alert("Erro ao excluir o item do banco.");
+        console.error("❌ Erro inesperado:", err);
+        alert("Erro inesperado ao salvar o item.");
     }
 }
 
