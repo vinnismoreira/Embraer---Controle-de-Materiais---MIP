@@ -12,23 +12,86 @@ class StockManager {
 
     async loadFromDatabase() {
     try {
+      const materiaisPermitidos = [
+        "LOCTITE 496",
+      ];
+
+      const { data, error } = await supabase
+        .from("GESTAO_DE_ESTOQUE")
+        .select("*")
+        .order("id", { ascending: false });
+
+      if (error) {
+        console.error("❌ Erro ao carregar dados:", error);
+        alert("Erro ao carregar dados do banco de dados.");
+        return;
+      }
+
+      const filtrados = data.filter((item) =>
+        materiaisPermitidos.includes(item.pn?.trim())
+      );
+
+      this.stockItems = filtrados;
+      this.renderTable();
+      this.updateItemsCount();
+      await this.updateStatusCards();
+
+      console.log("✅ Itens filtrados carregados:", filtrados);
+    } catch (err) {
+      console.error("❌ Erro inesperado ao carregar dados:", err);
+      alert("Itens filtrados carregados.");
+    }
+  }
+
+  async updateStatusCards() {
+    try {
         const { data, error } = await supabase
             .from("GESTAO_DE_ESTOQUE")
-            .select("*")
-            .order("id", { ascending: false });
+            .select("status");
 
         if (error) {
-            console.error("❌ Erro ao carregar dados do Supabase:", error.message);
-            alert("Erro ao carregar dados do banco: " + error.message);
+            console.error("❌ Erro ao buscar dados dos cards:", error.message);
             return;
         }
 
-        this.stockItems = data || [];
-        this.renderTable();
-        this.updateItemsCount();
+        if (!data || !Array.isArray(data)) {
+            console.error("❌ Dados inválidos retornados:", data);
+            return;
+        }
+
+        // Inicializa contadores
+        const statusCount = {
+            OK: 0,
+            "EM FALTA": 0,
+            VENCIDO: 0,
+            "EM DESCARTE": 0
+        };
+
+        // Conta cada status
+        data.forEach(item => {
+            const status = item.status?.trim()?.toUpperCase();
+            if (status && statusCount.hasOwnProperty(status)) {
+                statusCount[status]++;
+            }
+        });
+
+        // Atualiza cards no HTML
+        const ids = {
+            OK: "card-ok",
+            "EM FALTA": "card-falta",
+            VENCIDO: "card-vencido",
+            "EM DESCARTE": "card-descarte"
+        };
+
+        Object.entries(ids).forEach(([status, id]) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = statusCount[status] || 0;
+        });
+
+        console.log("📊 Status atualizados:", statusCount);
+
     } catch (err) {
-        console.error("❌ Erro inesperado ao carregar dados:", err);
-        alert("Erro inesperado ao carregar dados do banco.");
+        console.error("❌ Erro inesperado ao atualizar cards:", err);
     }
 }
 
