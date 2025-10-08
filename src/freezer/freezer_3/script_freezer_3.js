@@ -23,6 +23,8 @@ class StockManager {
             return;
         }
 
+        this.totalStockCount = (data || []).length;
+
         this.stockItems = data || [];
         this.renderTable();
         this.updateItemsCount();
@@ -34,6 +36,7 @@ class StockManager {
 
     constructor() {
     this.stockItems = [];
+    this.totalStockCount = 0;
     this.currentFilter = 'ALL';
     this.currentSearch = '';
     this.editingItemId = null;
@@ -328,7 +331,12 @@ async updateStatusCards() {
     }
 
     updateItemsCount() {
-        document.getElementById('items-count').textContent = `Exibindo ${this.getFilteredItems().length} de ${this.stockItems.length} itens`;
+        // A contagem de itens exibidos (filtrados na tela)
+        const displayedCount = this.getFilteredItems().length;
+        // A contagem de itens permitidos nesta página
+        const pageTotalCount = this.stockItems.length;
+        
+        document.getElementById('items-count').textContent = `Exibindo ${displayedCount} de ${pageTotalCount} itens (de ${this.totalStockCount} no total)`;
     }
 }
 
